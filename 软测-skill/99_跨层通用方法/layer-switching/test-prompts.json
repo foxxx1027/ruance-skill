@@ -1,0 +1,66 @@
+{
+  "skill": "layer-switching",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们体量只有对手的百分之一，全局上根本没法跟它正面拼，这是不是就没得打了？还能怎么保持主动？",
+      "expected_behavior": "调用 layer-switching，把整体层与局部层分开：整体取持久/防御/被动，选局部战场取速决/进攻/主动，集中优势力量快打快收",
+      "notes": "正面场景：整体远弱于对手、想在弱势里保持主动，命中 A2 情境 1 与关键触发『整体打不过怎么办』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "在一个大市场里整体打不过巨头，我在想要不要先挑一个细分市场，集中力气做到局部领先，先赢下这一小块？",
+      "expected_behavior": "调用 layer-switching，选定局部细分战场、给出集中优势力量的方式与速胜后的退出条件，用小胜逐步改变全局力量对比",
+      "notes": "正面场景：大市场打不过、挑细分单点取胜，命中 A2 情境 2"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我们钱少人少，这场竞争眼看要被拖成长期消耗，到底是熬下去，还是找机会拼一把？",
+      "expected_behavior": "调用 layer-switching，整体上承认持久与被动、不争一时胜负，同时在局部制造可速决的主动机会；并提示小胜能否累积需结合『两手准备』评估",
+      "notes": "正面场景：长期劣势、熬还是拼，命中 A2 情境 3 与语言信号『熬下去还是拼一把』"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "整体上我们肯定拼不过，所以我在想，这一次要不要干脆把全部家底都押上去，赌一把大的翻盘？",
+      "expected_behavior": "不应激活 layer-switching，应激活 favorable-decisive-battle（执行有利决战、避免不利决战，尤其排除 all-in）；本 skill 讲的是整体持久/局部速决的姿态分离，不是『要不要打这一次摊牌』",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：都在『整体劣势』语境，但此处是 all-in 决战的取舍，属 favorable-decisive-battle（二者 composes-with）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "对手规模是我们的十倍，我到底该不该入这个局、心态上怎么才能既不怯场又不轻敌？",
+      "expected_behavior": "不应激活 layer-switching，应激活 strategic-contempt-tactical-seriousness（战略藐视、战术重视的双层判断）；此处问的是敢不敢入局与心态，不是整体/局部姿态分离",
+      "notes": "跨 skill 混淆诱饵：都出现在『对手远强于我』的语境，但焦点是心态成对使用，属纸老虎双层判断"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我推荐三本适合产品经理入门看的书，最好有中文版。",
+      "expected_behavior": "纯信息推荐，不应激活任何战略类 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们和对手规模差不多，谁也吃不下谁，要不要也学那种整体上守、局部上攻的打法？",
+      "expected_behavior": "不应激活 layer-switching；按 B 段，双方实力接近、缺乏整体劣势时，层次分离失去意义，直接按常规竞争即可",
+      "notes": "边界：本 skill 以『整体明显劣势』为前提，实力接近时属 B 段排除"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我们整体确实很弱，但业务就这一个战场，也没法拆出别的局部，这种还能用层次转换吗？",
+      "expected_behavior": "不应激活（或调用后需先判定无层次可分）；按 B 段，只有单一战场、不存在可独立行动的局部时，无法在局部制造相对优势，方法前提不成立",
+      "notes": "边界：方法需要『长期整体 + 多个局部』的结构，单一战场无层次可分"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 favorable-decisive-battle 与 strategic-contempt-tactical-seriousness）+ 2 条 edge_case。全部 should_not_trigger 必须通过。"
+}

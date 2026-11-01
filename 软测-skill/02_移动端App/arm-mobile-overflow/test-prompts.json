@@ -1,0 +1,69 @@
+{
+  "skill": "arm-mobile-overflow",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "Windows Mobile 程序读文件就崩，PC 被 0x31313131 覆盖，怎么把它做成执行 shellcode 的 exploit？",
+      "expected_behavior": "应调用 arm-mobile-overflow；第一个动作是确认平台/架构/调试通道，重建 WinCE Slot 内存地图，再按 ARM 序言/尾声定位保存的 LR 偏移。",
+      "notes": "正面场景：Windows Mobile 上 PC 被可控填充覆盖，需要 ARM 栈帧与 payload 布局。"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "把 PC 上的栈溢出方法原样搬到 ARM 设备上，偏移完全对不上，返回地址也找不到，LR 和 R14 到底怎么算？",
+      "expected_behavior": "应调用 arm-mobile-overflow；第一个动作是重建 ARM 调用约定（R0–R3 传参、BL 写 LR、序言保存 LR），按反汇编实测缓冲区到保存 LR 的偏移。",
+      "notes": "正面场景：x86 模型迁移到 ARM 失败，核心是返回地址先到 LR 而非 EBP+4。"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "一个 Windows CE 程序没有源码，VS 只能 attach，我想从程序启动就开始调试，该选 IDA 远程调试还是别的？",
+      "expected_behavior": "应调用 arm-mobile-overflow；第一个动作是记录“无源码、需从启动介入”这一约束，据此选 IDA 远程调试，并用特征字符串锚点定位目标函数。",
+      "notes": "正面场景：移动端调试工具选择由约束决定，属于本 skill 的调试通道步骤。"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "手机 shellcode 里要调 MessageBox，但桌面上的函数地址在 Windows Mobile 上根本不存在，怎么找对应地址？",
+      "expected_behavior": "应调用 arm-mobile-overflow；第一个动作是核实目标 API 在 Windows CE 上是否存在，并按具体 OS build 重新定位函数地址，不照抄公开地址。",
+      "notes": "正面场景：WinCE API 是桌面 Win32 子集且地址随 OS build 变化。"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "Android 上某个 App 一启动就闪退，我想判断是崩在 Java 层、系统库还是加固壳的 so 层。",
+      "expected_behavior": "不应调用本 skill；应调用 android-vulnerability-analysis，第一个动作是按 APK/smali、so、系统层的分层路径定位崩溃层。",
+      "notes": "跨 skill 诱饵：Android 分层调试属于 android-vulnerability-analysis，不能套用 WinCE 的 Slot 与 API 假设。"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "x86 Windows 程序栈溢出，我已定位返回地址在 EBP+4，接下来想找一条 JMP ESP 跳板。",
+      "expected_behavior": "不应调用本 skill；应调用 win-stack-overflow-exploit，第一个动作是确认 EBP/EIP 偏移并搜索可用跳板指令。",
+      "notes": "跨 skill 诱饵：x86 栈帧与跳板属于 win-stack-overflow-exploit。"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我把这段英文技术文档翻译成中文，代码块和术语表保持原样。",
+      "expected_behavior": "不应调用任何漏洞分析 skill；直接完成翻译并保留格式。",
+      "notes": "完全无关场景，用于排除过度激活。"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "ARM64 手机上的原生程序出现栈溢出，能不能用 Windows Mobile 那套 LR/PC 方法算偏移？",
+      "expected_behavior": "不应调用；第一个动作是指出本 skill 只覆盖 32 位 ARM 的 WinCE/Windows Mobile，ARM64 的寄存器、调用约定与保护模型不同，应另选现代移动或通用利用方法。",
+      "notes": "边界：32 位 ARM WinCE 与 ARM64 现代移动端的分界，书中结论不可直接迁移。"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "Windows Mobile 程序开了 GS，溢出后被栈保护拦下，是不是该先绕 GS 再谈覆盖返回地址？",
+      "expected_behavior": "可调用本 skill，但第一个动作是确认编译选项：书中手机实验的前提是禁用 GS，WinCE 下的 GS 绕过不在覆盖范围，不能直接搬桌面端的 windows-stack-protection-bypass。",
+      "notes": "边界：本 skill 只要求关闭 GS，不提供移动端 GS 绕过，避免把桌面结论搬来。"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "skill": "trust-boundary-mapping",
+  "version": "0.1.0",
+  "source_book": "信息安全技术 应用软件安全编程指南（GB/T 38674-2020） — 国家市场监督管理总局、国家标准化管理委员会",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "服务 A 用 HTTP 调 B，B 再消费 Kafka 写 Redis，这条链上我该在哪几处重新校验参数？",
+      "expected_behavior": "应激活 trust-boundary-mapping，并沿控制权转移点列出 HTTP 入口、消息消费、缓存写入各自独立的闸门，而不是只在最外层校验一次。",
+      "notes": "正面场景：跨服务、消息队列与缓存的调用链，问的是闸门位置而不是校验规则。"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "网关说 token 已经验过了，内网服务之间互调时这个 userId 还能不能直接信？",
+      "expected_behavior": "应激活 trust-boundary-mapping，并把「上游已验证」当作需要复核的假设，为下游标出独立信任域与重新验证点。",
+      "notes": "正面场景：以「上游验过/内网调用」为由省略下游校验，是本 skill 最典型的触发语。"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "表单里那个隐藏的价格字段用户改不了吧，我直接拿它算总价可以吗？",
+      "expected_behavior": "应激活 trust-boundary-mapping，并判定 hidden 只是浏览器的呈现属性、提交后与可见参数同处边界外，要求服务端同权校验。",
+      "notes": "正面场景：把界面不可见当成信任依据（ce06 信任隐藏字段与客户端状态）。"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "Our service consumes messages from Kafka and writes them into Redis. Which hop still needs validation?",
+      "expected_behavior": "应激活 trust-boundary-mapping，并按「最后写入者」而不是调用方确定消息与缓存的信任域，指出每个跨界点需各自设闸门。",
+      "notes": "正面场景（英文）：测试双语触发，场景是消息队列 + 缓存两段链路。"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "JSP 里直接把 request.getParameter('name') 打到页面上，这个值要不要转义？",
+      "expected_behavior": "不应激活本 skill，应激活 input-validation-output-encoding——问题已收敛到 HTML 落点用哪套编码规则，不再需要重新确定闸门位置与两侧归属。",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：它长得像「这个值能不能信」，但用户实际问的是输出编码规则。"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我写了个单机离线脚本，只读本地 CSV 汇总后生成报表，这种也要按安全编码那套审吗？",
+      "expected_behavior": "不应激活本 skill：单进程、单入口、无外部输入的离线脚本只有一处输入，直接按输入校验处理即可。",
+      "notes": "诱饵：看似在问安全评审范围，实则落入本 skill 明确排除的离线单入口场景。"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "Redis 里的数据都是我们自己服务写进去的，读出来还要不要再校验一遍？",
+      "expected_behavior": "应激活 trust-boundary-mapping：缓存读出口是独立边界，除非能证明只有单一写者且写入前已验证，否则按不可信处理；存在多个写者时以最后写入者判定。",
+      "notes": "边界：「自己写的缓存」介于可信与不可信之间，考察是否用写者身份而非调用方来定边界。"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "覆盖 4 条正面场景（含 1 条英文）、2 条诱饵（1 条为兄弟 skill input-validation-output-encoding 的混淆，1 条为明确排除的离线单入口场景）与 1 条缓存读出口边界。should_not_trigger 容错为 0，诱饵专门验证不会被「要不要校验/要不要转义」这类字面信号带偏。"
+}

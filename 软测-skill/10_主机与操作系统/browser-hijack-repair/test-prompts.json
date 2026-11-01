@@ -1,0 +1,76 @@
+{
+  "skill": "browser-hijack-repair",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "Chrome 主页被改成某个导航站，在设置里改回来过一会儿又变回去。",
+      "expected_behavior": "调用本 skill，先找周期性写入源，再修键位，而不是反复改主页",
+      "notes": "正面场景：反复回写"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "IE 右键菜单多了个陌生网站链接，怎么删？",
+      "expected_behavior": "调用本 skill，定位 MenuExt，展开确认指向并同步删除引用文件",
+      "notes": "正面场景：右键菜单劫持"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "浏览器标题栏一直显示广告，查看源文件菜单也没了。",
+      "expected_behavior": "调用本 skill，按症状定位不同键位，区分标题栏与 Restrictions 两类写入点",
+      "notes": "正面场景：多症状并存"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "公用电脑要还给别人，怎么清表单、历史和保存的密码？",
+      "expected_behavior": "调用本 skill，按场景清理隐私痕迹，并检查是否还有自动填充残留",
+      "notes": "正面场景：公用电脑隐私清理"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "这个网站弹出证书警告，是不是钓鱼站？",
+      "expected_behavior": "不应调用本 skill，应转 identity-deception-detection 判断证书与域名",
+      "notes": "跨书诱饵：身份欺骗检测"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "电脑一直弹广告，任务管理器里还有陌生进程。",
+      "expected_behavior": "不应调用本 skill，应先按 malware-triage-order 处置恶意代码",
+      "notes": "跨书诱饵：已失陷终端"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "Windows 登录界面会显示上次登录的用户名，怎么关掉？",
+      "expected_behavior": "不应调用本 skill，应调用 host-default-surface-convergence",
+      "notes": "同书兄弟诱饵：主机默认值"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "公司电脑主页被锁成内网首页，改不了，这是被劫持了吗？",
+      "expected_behavior": "不按恶意劫持处理；判断是否由域策略或安全软件统一下发，转策略管理员确认",
+      "notes": "边界：受管终端"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "Edge 的默认搜索引擎被换成了 Bing，这算浏览器劫持吗？",
+      "expected_behavior": "先核对是否为浏览器更新或安装器改的默认设置，不直接进入键位修复流程",
+      "notes": "边界：默认设置变更不等于劫持"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "浏览器已经重置过了，打开还是跳转到陌生页面，怎么办？",
+      "expected_behavior": "调用本 skill，说明重置不清写入源，继续查扩展、计划任务、快捷方式参数与策略",
+      "notes": "边界：重置无效"
+    }
+  ]
+}

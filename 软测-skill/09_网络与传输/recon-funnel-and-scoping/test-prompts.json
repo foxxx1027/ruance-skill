@@ -1,0 +1,76 @@
+{
+  "skill": "recon-funnel-and-scoping",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "新接手一个办公网，没有资产台账，想先摸清哪些主机在线、分别开了什么服务",
+      "expected_behavior": "调用本 skill，按存在→OS→端口→拓扑→漏洞范围推进",
+      "notes": "正面：资产不清"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "我 ping 不通 10.0.0.23，同事说那台机器一直在跑，是不是防火墙拦了？",
+      "expected_behavior": "调用本 skill，拆可达性假设，不判“不存在”",
+      "notes": "正面：否定结果解释"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "nmap 扫出来几十条高危，怎么判断先验证哪几条？",
+      "expected_behavior": "调用本 skill，收敛为可验证清单",
+      "notes": "正面：扫描结果收敛"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "我们要做一次授权内的内网暴露面梳理，应该按什么顺序来？",
+      "expected_behavior": "调用本 skill，先锁授权再走漏斗",
+      "notes": "正面：授权侦察"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "帮我把这个 nmap 命令的参数解释一下",
+      "expected_behavior": "不调用任何方法论 skill，只解释参数",
+      "notes": "诱饵：工具用法"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "服务器好像中了挖矿，CPU 100%，先怎么处理？",
+      "expected_behavior": "应调用 malware-triage-order，不是本 skill",
+      "notes": "跨 skill 诱饵：已感染处置"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "ARP 表里网关 MAC 一直在变，是不是有人搞事？",
+      "expected_behavior": "应调用 identity-deception-detection",
+      "notes": "跨 skill 诱饵：二层欺骗"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我只知道一个域名，想看看它对外暴露了什么",
+      "expected_behavior": "应触发，从 DNS/解析与端口入手",
+      "notes": "边界：只有域名"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "生产工控网能不能直接跑一次全端口扫描？",
+      "expected_behavior": "应触发，但先评估授权与中断风险，改用被动方式",
+      "notes": "边界：高风险环境"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "我 ping 通了目标，TTL=64，接下来该查什么才能确认系统？",
+      "expected_behavior": "应触发，说明 TTL 只是候选，需端口/banner/服务佐证",
+      "notes": "边界：单点指纹需二次确认"
+    }
+  ]
+}

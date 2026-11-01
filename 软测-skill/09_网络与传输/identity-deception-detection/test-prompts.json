@@ -1,0 +1,76 @@
+{
+  "skill": "identity-deception-detection",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "办公室网络时好时坏，过一会自己恢复，网关 MAC 还老变",
+      "expected_behavior": "调用本 skill，按二层映射污染排查",
+      "notes": "正面：间歇故障"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "访问公司 OA 跳转到登录页，但域名看着不对，怎么判断是钓鱼还是 DNS 问题？",
+      "expected_behavior": "调用本 skill，分层核对证书/DNS/ARP",
+      "notes": "正面：分层定位"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "链接显示的是银行域名，点开却是另一个网站",
+      "expected_behavior": "调用本 skill，指出显示文本与 href 分离",
+      "notes": "正面：URL 欺骗"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "输入密码提示错误，但页面和官网一模一样",
+      "expected_behavior": "调用本 skill，按第一次提交即泄露处置",
+      "notes": "正面：凭据泄露"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "Wi-Fi 被蹭了，怎么加固",
+      "expected_behavior": "应调用 wireless-security-grading",
+      "notes": "跨 skill 诱饵：无线加固"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "怎么给路由器绑定静态 IP",
+      "expected_behavior": "不调用本 skill，这是普通配置操作",
+      "notes": "诱饵：配置操作"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "邮件附件打不开，是不是病毒",
+      "expected_behavior": "应调用 malware-triage-order",
+      "notes": "跨 skill 诱饵：恶意附件"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "ping 网关丢包 30%，是 ARP 欺骗吗？",
+      "expected_behavior": "应触发，但先排除链路/负载再下结论",
+      "notes": "边界：现象多因"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "HTTPS 证书报警告，还能继续登录吗？",
+      "expected_behavior": "应触发，核对证书域名与签发链",
+      "notes": "边界：证书告警"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "同事说他的电脑总掉线，别人都正常",
+      "expected_behavior": "可触发，但先按单机故障排除，不急着归因欺骗",
+      "notes": "边界：非成片故障"
+    }
+  ]
+}

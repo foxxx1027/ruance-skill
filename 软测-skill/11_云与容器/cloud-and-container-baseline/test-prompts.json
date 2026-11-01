@@ -1,0 +1,76 @@
+{
+  "skill": "cloud-and-container-baseline",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "st-01",
+      "type": "should_trigger",
+      "prompt": "云上安全组好像开了 0.0.0.0/0 的 22 和 3306，我想把公网暴露面整体过一遍。",
+      "expected_behavior": "调用 cloud-and-container-baseline；先盘资产与公网入口，核安全组、网络 ACL 与防火墙，输出端口—服务—暴露原因—限制措施清单。",
+      "notes": "云网络暴露与安全组基线。"
+    },
+    {
+      "id": "st-02",
+      "type": "should_trigger",
+      "prompt": "容器扫描说有好几个 Pod 是 root 跑的，还有挂了主机目录的，风险在哪、先改哪个？",
+      "expected_behavior": "调用 cloud-and-container-baseline；核运行时权限、特权模式、hostPath 与能力集，按可利用性与影响范围排序修复。",
+      "notes": "容器运行时基线与逃逸风险。"
+    },
+    {
+      "id": "st-03",
+      "type": "should_trigger",
+      "prompt": "K8s 的 API Server 能从外网访问，RBAC 里还有 cluster-admin 的默认账号，怎么核查？",
+      "expected_behavior": "调用 cloud-and-container-baseline；检查控制面暴露、匿名认证、RBAC 绑定与 ServiceAccount，输出主体—资源—动作矩阵。",
+      "notes": "K8s 控制面与授权基线。"
+    },
+    {
+      "id": "st-04",
+      "type": "should_trigger",
+      "prompt": "客户要我们证明云上开了审计日志、WAF 也在拦截，不只看有没有买服务。",
+      "expected_behavior": "调用 cloud-and-container-baseline；核对日志集中收集、WAF 阻断模式、告警接收人与处置记录，并抽查一条告警闭环。",
+      "notes": "检测与日志能力属于基线的一部分。"
+    },
+    {
+      "id": "snt-01",
+      "type": "should_not_trigger",
+      "prompt": "Windows 机器默认共享和远程注册表还开着，怎么收敛这些系统默认面？",
+      "expected_behavior": "不应调用本 skill；应调用 host-default-surface-convergence，或转 remote-access-surface-audit 审计远程注册表等远程入口。",
+      "notes": "聚焦 Windows 默认组件，不是云与容器基线；主机默认面与远程入口两个入口都成立。"
+    },
+    {
+      "id": "snt-02",
+      "type": "should_not_trigger",
+      "prompt": "想摸清办公网里到底有哪些设备、能不能看到彼此，怎么做隔离？",
+      "expected_behavior": "不应调用本 skill；应调用 lan-visibility-and-containment，做内网可见性与隔离。",
+      "notes": "内网资产发现与横向隔离。"
+    },
+    {
+      "id": "snt-03",
+      "type": "should_not_trigger",
+      "prompt": "堡垒机和 VPN 谁能登录、有没有 MFA，想审计远程入口。",
+      "expected_behavior": "不应调用本 skill；应调用 remote-access-surface-audit，审计远程入口的认证与暴露。",
+      "notes": "远程入口审计，不是云资源配置基线。"
+    },
+    {
+      "id": "ec-01",
+      "type": "edge_case",
+      "prompt": "对象存储桶是公开的，但里面只是官网图片，也要按高危处理吗？",
+      "expected_behavior": "调用 cloud-and-container-baseline；先确认桶策略与是否存在写入或列举权限，再联动 data-protection-and-secrets 判断数据级别与影响。",
+      "notes": "公开本身是配置问题，严重度取决于权限与数据级别。"
+    },
+    {
+      "id": "ec-02",
+      "type": "edge_case",
+      "prompt": "日志都开了，但没人看告警，这算基线不合格吗？",
+      "expected_behavior": "调用 cloud-and-container-baseline；把告警接收人、阈值与处置闭环纳入检测能力核查，判定为运营缺口而非单纯日志缺失。",
+      "notes": "检测能力不等于日志开关。"
+    },
+    {
+      "id": "ec-03",
+      "type": "edge_case",
+      "prompt": "我们用的是托管 K8s，控制面配置改不了，基线还怎么查？",
+      "expected_behavior": "调用 cloud-and-container-baseline；把控制面项转为核验托管方责任边界与可配置项，重点查工作负载、RBAC 与审计导出。",
+      "notes": "托管服务的责任共担，需要调整基线适用范围。"
+    }
+  ]
+}

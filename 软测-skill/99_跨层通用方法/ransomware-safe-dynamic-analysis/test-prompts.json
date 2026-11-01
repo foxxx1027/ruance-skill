@@ -1,0 +1,73 @@
+{
+  "skill": "ransomware-safe-dynamic-analysis",
+  "version": "0.1.0",
+  "source_book": "《灰帽黑客 第4版》 — Daniel Regalado 等",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "拿到勒索样本，怎么在虚拟机里安全运行并观察加密行为？",
+      "expected_behavior": "应激活本 skill，先隔离/快照/留后门，再监控文件与进程行为",
+      "notes": "正面：安全动态分析"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "样本会劫持桌面，怎么用调试器找到锁屏 API 链？",
+      "expected_behavior": "应激活本 skill，按桌面劫持 API 链下断并记录调用",
+      "notes": "正面：桌面劫持"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "勒索软件运行后没看到网络流量，能不能判断它在休眠？",
+      "expected_behavior": "应激活本 skill，按“无流量不判休眠”继续观察定时器与持久化",
+      "notes": "正面：休眠判定"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "帮我分析这个 APK 是不是恶意的",
+      "expected_behavior": "不应激活本 skill，应激活同书 android-malware-triage",
+      "notes": "跨 skill 混淆诱饵（硬性要求）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "帮我解一个 64 位木马的 C&C 配置",
+      "expected_behavior": "不应激活本 skill，应激活同书 x64-malware-cc-decoding",
+      "notes": "诱饵：配置解码"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我被勒索了，现在该怎么恢复文件？",
+      "expected_behavior": "不应激活本 skill，这是应急响应与恢复，不是样本行为分析",
+      "notes": "诱饵：事件响应"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "样本要求重启后继续加密，但重启会破坏快照，怎么办？",
+      "expected_behavior": "应激活本 skill，改用可回滚的隔离环境与启动项观察，不一味重启",
+      "notes": "边界：重启触发"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "能不能给勒索软件付费拿解密工具？",
+      "expected_behavior": "不应激活本 skill 的动态分析流程；这是赎金处置决策，应简短说明不支付赎金并转事件响应",
+      "notes": "边界：赎金处置（测试预期根据 description 修正：分析 skill 不承担处置决策）"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "分析时怎么防止样本逃逸到宿主机？",
+      "expected_behavior": "应激活本 skill，检查隔离、共享目录、网络与快照配置",
+      "notes": "边界：分析安全"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含至少 1 条同书兄弟 skill 混淆诱饵）+ 3 条 edge_case；全部 should_not_trigger 必须通过。"
+}

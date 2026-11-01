@@ -1,0 +1,59 @@
+{
+  "skill": "concurrency-safety",
+  "version": "0.1.0",
+  "source_book": "信息安全技术 应用软件安全编程指南（GB/T 38674-2020） — 国家市场监督管理总局、国家标准化管理委员会",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "压测时库存偶尔被扣成负数，代码是先查再减，本地怎么都复现不了",
+      "expected_behavior": "应激活 concurrency-safety，并识别“先查再减”不是原子操作，要求把校验与扣减放进同一临界区或用原子 CAS，并检查读写是否在同一把锁上。",
+      "notes": "正面场景：偶发超发/计数错乱，是该 skill 最典型的触发信号。"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "服务跑几小时就卡死，jstack 里两个线程各拿着对方要的锁，怎么排查？",
+      "expected_behavior": "应激活 concurrency-safety，并画出多锁获取顺序表，要求统一加锁顺序、反向释放、临界区内不做阻塞调用，异常路径也要释放锁。",
+      "notes": "正面场景：死锁与锁顺序问题。"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "Our thread pool queue fills up under load and requests time out — how should we size it and choose a rejection policy?",
+      "expected_behavior": "应激活 concurrency-safety，并按线程池生命周期排查：池大小与队列容量按峰值规划、选择明确拒绝策略、池内任务不得等待同池任务、任务可中断且异常上报。",
+      "notes": "英文正向场景：线程池容量与拒绝策略，测试双语触发。"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "用 AtomicInteger 给接口做限流，流量一高还是超了，原子类不是安全的吗？",
+      "expected_behavior": "应激活 concurrency-safety，并说明原子性只覆盖单次操作，一个表达式里两次读取会留出窗口，应改用 compareAndSet 循环或单次原子更新。",
+      "notes": "正面场景：误以为原子类等于整体线程安全，对应“一个表达式两次访问原子变量”的规则。"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "连接池里的连接借出去忘了关，跑一天就报连接数耗尽，怎么定位？",
+      "expected_behavior": "不应激活本 skill，应激活 memory-and-resource-safety，因为根因是资源申请与释放不配对、每条退出路径没有归还连接，而不是锁或线程同步语义。",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：连接泄漏会表现为资源耗尽，容易被并发 skill 抢走，实际应归 memory-and-resource-safety。"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "Redis 分布式锁在主从切换时偶尔失效，这个要怎么保证一致性？",
+      "expected_behavior": "不应激活本 skill，因为分布式锁与跨进程一致性明确不在其范围内，应转分布式系统一致性或中间件方案评估。",
+      "notes": "诱饵：带“锁”字样但属于分布式锁，检验是否会仅凭关键词误触发。"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "服务是单线程事件循环，所有请求串行处理，共享的 HashMap 还需要加锁吗？",
+      "expected_behavior": "通常不应激活本 skill：单线程或纯消息传递架构不属于其范围；但需先确认没有隐藏线程池、定时器、异步回调或框架工作线程会写同一份数据，一旦存在跨线程访问则应按 concurrency-safety 重新检查。",
+      "notes": "边界：单线程模型的“看起来不用锁”需要先验证没有隐藏并发源，避免机械套用锁建议。"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条正向覆盖超发竞态、死锁、线程池（英文）、原子变量误用；2 条诱饵中 1 条为兄弟 skill memory-and-resource-safety 的连接泄漏场景，另 1 条为分布式锁（范围外）；边界题检验单线程架构的排除条件。所有 should_not_trigger 必须通过。"
+}

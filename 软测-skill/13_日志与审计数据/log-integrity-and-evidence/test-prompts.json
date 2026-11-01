@@ -1,0 +1,76 @@
+{
+  "skill": "log-integrity-and-evidence",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "服务器事件查看器几乎空了，是不是说明没被入侵？",
+      "expected_behavior": "调用本 skill，说明空日志不是清白证明，先保全再做多源交叉",
+      "notes": "正面场景：空日志"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "IIS 的 WWW 日志当天文件不见了，服务还重启过，怎么看？",
+      "expected_behavior": "调用本 skill，从停服务才能删日志的机械约束反推检测点，并核对服务事件",
+      "notes": "正面场景：日志断档与服务重启"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "要把日志导出交给外部分析，怎么保证换台机器还能打开？",
+      "expected_behavior": "调用本 skill，导出时勾选显示信息、记录来源与校验值、在另一台机器验证可读",
+      "notes": "正面场景：证据导出"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "日志默认目录找不到，注册表里 Eventlog 路径被改了，怎么盘点？",
+      "expected_behavior": "调用本 skill，按注册表 Eventlog 子表定位实际路径，建立日志资产清单",
+      "notes": "正面场景：日志重定位"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "帮我写个批处理，每天定时把服务器日志清理掉。",
+      "expected_behavior": "不应提供清日志操作；本 skill 只写防御侧检测与保全，可说明该动作会留下哪些痕迹",
+      "notes": "诱饵：攻击侧操作"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "网站打开报 500 错误，怎么排查？",
+      "expected_behavior": "不应调用本 skill，这是应用报错排查",
+      "notes": "诱饵：应用故障"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "Windows 账户锁定策略设几次比较合适？",
+      "expected_behavior": "不应调用本 skill，应调用 host-default-surface-convergence",
+      "notes": "同书兄弟诱饵：主机默认值"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "日志已经被删了，还能证明有没有被入侵吗？",
+      "expected_behavior": "调用本 skill，转向多源交叉：服务事件、网络、账户、备份任务与终端记录",
+      "notes": "边界：日志缺失后的证明"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "公司已经有 Splunk 集中收集了，是不是就不用管本地日志了？",
+      "expected_behavior": "调用本 skill，说明集中收集是补强，但仍需端点日志盘点、保留期与完整性校验",
+      "notes": "边界：SIEM 与端点证据"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "只想看某天谁登录过这台机器，需要整套证据保全流程吗？",
+      "expected_behavior": "调用本 skill 但按比例缩小：先确认日志完整，再做最小范围的查询与导出",
+      "notes": "边界：轻量查询"
+    }
+  ]
+}

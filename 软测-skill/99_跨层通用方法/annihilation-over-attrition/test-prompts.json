@@ -1,0 +1,59 @@
+{
+  "skill": "annihilation-over-attrition",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们手上钱和人都不多，是在三条产品线上各铺一点，还是把资源全砸到其中一条，做到别人根本比不了？",
+      "expected_behavior": "调用 annihilation-over-attrition，先界定真正要削弱的『对手有生力量』，再对比『摊开做多条』与『集中打透一条』各自的净收益，选定唯一主攻目标并给出资源集中量",
+      "notes": "正面场景：资源有限、在『全面铺开还是单点突破』之间摇摆，命中 A2 情境 1"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "这一年我们签了好几个单子，可竞争对手的招牌产品一点没受影响，客户随时能换回去，我总觉得这么打赢不踏实，到底怎么才算真赢了？",
+      "expected_behavior": "调用 annihilation-over-attrition，指出这是『只击溃未歼灭』，把胜负判据从『占了多少』改为『对手核心再战能力是否被削弱』，并给出可观察判据",
+      "notes": "正面场景：赢了小仗但对手核心力量未损，命中 A2 情境 3 与『怎么才算赢』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我们为了守住已经拿下的那批存量客户，把最能打的团队都派去维护了，可真正决定胜负的新战场反而没人手，是不是本末倒置了？",
+      "expected_behavior": "调用 annihilation-over-attrition，识别『守地盘』与『消灭对手有生力量』的目标冲突，指出可暂时放弃部分次要阵地、把优势力量转向关键战场，并写明愿意让步的内容",
+      "notes": "正面场景：为守地盘而不敢挪资源，命中 A2 情境 4"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "手上七八个任务都卡着死线，我的资源只够全力保住一个，到底该先押哪个？",
+      "expected_behavior": "不应激活 annihilation-over-attrition，应激活 principal-contradiction（抓主要矛盾与集中力量）；本 skill 管的是『这一仗以什么为目标、怎样才算赢』，而此处是『该先往哪个方向用力』的选择题",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：字面出现『集中力量/选一个』，但场景属于 principal-contradiction 的势力范围（选方向），正确答案是它而非本 skill"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我们的对外服务要求 99.99% 可用性，各地都加了冗余节点，现在成本有点高，要不要砍掉一些备份？",
+      "expected_behavior": "不应激活 annihilation-over-attrition；目标本身就是『铺开覆盖、守住可用性底线』，退让次要方向会造成不可接受的损失，属于 B 段明确排除的场景",
+      "notes": "诱饵：字面沾『要不要减点东西、集中一下』，实质是守土/覆盖类目标，方法不适用"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我查一下 pandas 里 groupby 之后怎么按多列聚合，最好给个例子",
+      "expected_behavior": "纯技术信息查询，不应激活任何战略/决策类 skill，更不应激活本 skill",
+      "notes": "诱饵：完全无关场景（查 API 用法）"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们在做一个面向偏远县的公益项目，目标是尽可能多的县都覆盖到基础服务，现在纠结是每个县只做六十分，还是集中把几个县做到一百分。",
+      "expected_behavior": "不应激活 annihilation-over-attrition；虽然形式上也面对『铺开还是集中』，但本项目的目标函数就是『覆盖/守土』，按 B 段退让次要方向会直接损害目的，宜转统筹兼顾一类方法",
+      "notes": "边界：区分『以削弱对手为目标』与『以覆盖为目的』——后者不适用歼灭逻辑，是本 skill 最容易误触的边界"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含 1 条跨 skill 混淆诱饵指向 principal-contradiction）+ 1 条 edge_case。全部 should_not_trigger 必须通过（诱饵容错为 0）。"
+}

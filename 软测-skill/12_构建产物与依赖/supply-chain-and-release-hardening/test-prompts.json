@@ -1,0 +1,66 @@
+{
+  "skill": "supply-chain-and-release-hardening",
+  "version": "0.1.0",
+  "source_book": "信息安全技术 应用软件安全编程指南（GB/T 38674-2020） — 国家市场监督管理总局、国家标准化管理委员会",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "安全扫描说我们用的 log4j 有高危漏洞，业务死活不升级。我至少想确认内部仓库里这个包是不是官方原版、构建时有没有被替换过——这够吗？",
+      "expected_behavior": "应激活 supply-chain-and-release-hardening，并说明哈希或签名只覆盖完整性，仍需核对来源与锁定方式、检查构建链的依赖版本判断与关键库校验、收口发布面残留；同时指出漏洞定级与修复优先级应由依赖治理流程决定，不由本 skill 替代。",
+      "notes": "正面场景：组件带已知漏洞但无法升级时，争点从「怎么修漏洞」转向「交付产物还能怎么核对与收口」，用于与 supply-chain-and-dependency-security 的 CVE 定级场景区分。"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "发版打包发现 war 里还留着测试接口和示例页面，交付前还要清哪些东西？",
+      "expected_behavior": "应激活 supply-chain-and-release-hardening，并按发布面收口：清除调试与测试残留、删除示例应用与用户可见注释、检查配置可审计、关闭不需要的服务与目录列表、客户端产物签名加固。",
+      "notes": "正面场景：发版前残留清理与交付收口。"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "Our npm packages come from an internal mirror — is that enough, or do we still need hash verification?",
+      "expected_behavior": "应激活 supply-chain-and-release-hardening，并说明私有镜像只解决来源问题，完整性仍需哈希或签名校验，同时补上漏洞时效与许可证两项。",
+      "notes": "英文正向场景：误以为内部镜像等于供应链安全，测试双语触发。"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "CI 里同一个工程 Release 和 Debug 配置混着用，头文件搜索路径也不固定，风险大吗？",
+      "expected_behavior": "应激活 supply-chain-and-release-hardening，并把构建链当安全边界：统一 Release/Debug、固定依赖版本、控制头文件搜索路径、关键库做哈希校验、中间产物移出源码目录。",
+      "notes": "正面场景：构建链配置漂移导致产物与源码不一致。"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "打出来的 jar 有 80MB，启动还慢，怎么裁依赖、优化体积？",
+      "expected_behavior": "不应激活本 skill（也不应激活任何安全 skill），因为这属于依赖裁剪与启动性能优化，不涉及组件来源、完整性、已知漏洞或发布残留的安全判断。",
+      "notes": "诱饵：带“依赖 / 产物”关键词但属性能问题，检验是否会因字面相似误触发。"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "配置文件里的数据库密码是明文，要不要加密，密钥又该放哪？",
+      "expected_behavior": "不应激活本 skill，应激活 sensitive-data-lifecycle，因为争点是敏感字段的加密、密钥管理与留存，而不是第三方组件来源、构建链或发布产物残留。",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：配置与密钥话题容易被交付加固 skill 抢走，实际归属敏感数据生命周期。"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "扫描器报了我们两百多个 CVE，怎么按可利用性排序、哪些先修，客户还催着要 SBOM，这块怎么弄？",
+      "expected_behavior": "不应激活本 skill，应激活 supply-chain-and-dependency-security——争点是漏洞定级、修复优先级与 SBOM 清单产出，不是交付前的来源完整性核对与发布面收口。",
+      "notes": "跨 skill 混淆诱饵：与 supply-chain-and-dependency-security 刚划清的分界，检验 CVE 治理类问题不会被本 skill 抢走。"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "依赖都锁了版本、也全部走内部仓库，供应链这块是不是就齐了？",
+      "expected_behavior": "应激活 supply-chain-and-release-hardening：锁定版本与内部仓库只覆盖来源和部分时效，仍需完整性校验、持续漏洞检测、构建链一致性、开发环境隔离与发布面收口，四问缺一即留盲区。",
+      "notes": "边界：容易被误判为“已经做完”的半覆盖状态，检验能否指出剩余缺口而非简单肯定。"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条正向覆盖产物可信性、发版残留清理、私有镜像（英文）、构建链配置漂移；3 条诱饵中 1 条为纯性能的产物体积优化，1 条为兄弟 skill sensitive-data-lifecycle 的密钥管理场景，1 条为 supply-chain-and-dependency-security 的 CVE 排序与 SBOM 场景（用于验证 2026-10-24 划分的职责边界）；边界题检验「锁版本+内部仓库是否等于供应链安全」。所有 should_not_trigger 必须通过。"
+}

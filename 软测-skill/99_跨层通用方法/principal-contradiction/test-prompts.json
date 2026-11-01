@@ -1,0 +1,73 @@
+{
+  "skill": "principal-contradiction",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "手上四个项目同时在推，人就这么多，到底该先保哪个？每个都有人催。",
+      "expected_behavior": "调用 principal-contradiction，列出在压方向、找出起决定作用的主要矛盾、只设一个中心并集中力量",
+      "notes": "正面场景：资源不够、该先抓哪个，命中 A2 情境 1 与语言信号『资源只够做一个』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "公司今年列了八个『同等重要』的目标，资源明显不够，得有人帮我砍到只留一个中心。",
+      "expected_behavior": "调用 principal-contradiction，反对平均主义，砍到单中心、对次要方向主动让步缓和",
+      "notes": "正面场景：年度规划目标太多需聚焦，命中 A2 情境 3 与『每个都很重要』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我被三个方向同时施压：客户催货、供应商掉链子、团队还闹情绪，是不是得全都救？越救越乱。",
+      "expected_behavior": "调用 principal-contradiction，识别主要矛盾、集中力量打一处、对次要方向暂缓以避免四面树敌",
+      "notes": "正面场景：多方向同时出问题想全都救，命中 A2 情境 2"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "要不要同时开三条产品线、全面铺开抢市场？还是我该收一收？",
+      "expected_behavior": "调用 principal-contradiction，反对全线出击/两个拳头打人，主张主要使用方向只应有一个",
+      "notes": "正面场景：要不要全面铺开、多线作战，命中 A2 情境 4 与『要不要全面铺开』"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我正在评价一个下属，他业务能力很强但态度很差、还当众顶撞我，是不是就该全面否定、直接开掉？",
+      "expected_behavior": "不应激活 principal-contradiction，应激活 two-points-one-focus；后者就同一对象兼顾两面再分主次（认识与评价），本 skill 是在多个矛盾间择一聚焦",
+      "notes": "跨 skill 混淆诱饵（高混淆对）：两者都涉及『主次』，但对象是同一人的两面而非多个任务方向"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "要给追责方案定一条『不超过百分之几』的红线，可我连大概涉及多少人都说不清。",
+      "expected_behavior": "不应激活 principal-contradiction，应激活 quantitative-grasp；后者把判断落成可核查的数字与决定质量的数量界限",
+      "notes": "跨 skill 混淆诱饵（高混淆对）：都像『给方案定调』，但焦点是做数量分析与设上限"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我查一下明天北京飞广州有哪些航班。",
+      "expected_behavior": "纯信息查询，不应激活任何方法论 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "手头五个任务权重差不多，而且各自都有硬性的截止日，怎么排期？",
+      "expected_behavior": "不应激活 principal-contradiction；B 段指出多任务等权重且都有硬死线时，『只一个中心』不能一刀切，应按约束与时序排布",
+      "notes": "边界：区分『多矛盾择一聚焦』与『等权重死线的事务排序』"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我这边就只有一个目标，根本谈不上取舍，其实是想定个执行节奏。",
+      "expected_behavior": "不应激活 principal-contradiction；B 段指出单一目标、无需取舍的场景不适用本 skill",
+      "notes": "边界：区分『多目标取舍』与『单一目标执行』"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，指向高混淆对 two-points-one-focus 与 quantitative-grasp）+ 2 条 edge_case。全部 should_not_trigger 必须通过。"
+}

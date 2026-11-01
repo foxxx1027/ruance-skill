@@ -1,0 +1,73 @@
+{
+  "skill": "practice-cognition-loop",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们这款产品连着改了三轮还是没起色，是不是说明方向根本错了？还该不该再试一轮？",
+      "expected_behavior": "调用 practice-cognition-loop，把一次失败当作第二阶段的反馈信号，取一手经验、形成可检验判断、设计可观测的下一轮实验",
+      "notes": "正面场景：失败是否等于方向错、要不要迭代，命中 A2 情境 1 与语言信号『失败了是不是方向错了』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "做了五年运营，脑子里一堆零散的经验和感觉，怎么才能总结成能复用的规律？",
+      "expected_behavior": "调用 practice-cognition-loop，走第一次飞跃把感性材料上升为可检验的判断，再送回实践检验",
+      "notes": "正面场景：经验怎么提炼成规律，命中 A2 情境 2"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "方案在纸上改了半年，一直不敢动手，总觉得还没想透，心里不踏实。",
+      "expected_behavior": "调用 practice-cognition-loop，指出只停在上层空转是教条主义一端，把认识送回实践检验并设定可观测指标",
+      "notes": "正面场景：光想不做、想而不做，命中 A2 情境 3 与『光想不做』"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "团队天天埋头干活，从不回头总结，我想给他们建一个复盘—验证—修正的机制。",
+      "expected_behavior": "调用 practice-cognition-loop，按四步闭环设计：取一手经验→上升为认识→回实践检验→依反馈修正进入下一轮",
+      "notes": "正面场景：想为判断设定检验—修正机制，命中 A2 情境 4"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "手上一堆访谈记录，信息很杂，我想把里面的真需求挑出来、透过现象看本质。",
+      "expected_behavior": "不应激活 practice-cognition-loop，应激活 material-refinement；那是第一次飞跃内部的加工工序（去粗取精等），本 skill 是覆盖两次飞跃的整体框架",
+      "notes": "跨 skill 混淆诱饵：都涉及『从经验到认识』，但材料已在手、问的是加工工序"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "情况还没摸清，老板就让我拍板，我是不是该先下去调研一圈、开个调查会再定？",
+      "expected_behavior": "不应激活 practice-cognition-loop，应激活 investigation-method；后者专管『取到一手材料』这一前置动作（要不要调、怎么调）",
+      "notes": "跨 skill 混淆诱饵：都强调一手经验，但此处焦点是『要不要先调查取证』"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我推荐一家附近口碑好的川菜馆。",
+      "expected_behavior": "纯信息查询，不应激活任何方法论 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "有个判断要十年后才见分晓、中间变量特别多，我想现在就用一轮小实验来检验它到底对不对。",
+      "expected_behavior": "不应激活 practice-cognition-loop；B 段指出长周期、多变量、反馈严重滞后的场景，一次结果无法归因，不能简单用一次结果给认识定罪",
+      "notes": "边界：区分『反馈及时的实践检验』与『反馈严重滞后的超长周期判断』"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我在推一个纯数学证明，想靠『实践检验』来判断它成立不成立。",
+      "expected_behavior": "不应激活 practice-cognition-loop；B 段指出纯理论、逻辑推演类问题无需也无从用实践效果检验",
+      "notes": "边界：区分『可实践检验的问题』与『纯理论推演』"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 material-refinement 与 investigation-method）+ 2 条 edge_case。全部 should_not_trigger 必须通过。"
+}

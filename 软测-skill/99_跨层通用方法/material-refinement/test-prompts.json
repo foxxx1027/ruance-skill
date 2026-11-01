@@ -1,0 +1,59 @@
+{
+  "skill": "material-refinement",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "刚做完十几场用户访谈，记录一大摞，信息很多但我理不出头绪，到底该怎么梳理才能看出门道？",
+      "expected_behavior": "调用 material-refinement，按去粗取精、去伪存真、由此及彼、由表及里四道工序依次加工，输出概念与判断而非现象罗列",
+      "notes": "正面场景：材料一堆但理不出头绪，命中 A2 情境 1、2 与语言信号『一堆反馈怎么变成洞察』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "收了几百条用户反馈，里面什么都有，骂的夸的混在一起，我怎么分辨哪些是真正的需求、哪些只是情绪发泄？",
+      "expected_behavior": "调用 material-refinement，重点执行去伪存真（标出证据等级、剔除或标记不实/情绪化信息），再由此及彼联系、由表及里提炼本质",
+      "notes": "正面场景：真假混杂需分辨真需求，命中 A2 情境 3 与语言信号『哪些是真需求』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "手上全是零散的现象和数据，我总停在描述层面，怎么才能透过表面看出背后的本质和规律？",
+      "expected_behavior": "调用 material-refinement，用由此及彼形成材料间的因果联系、由表及里给出本质判断，并检查材料不足时回补调查",
+      "notes": "正面场景：想透过现象看本质，命中 A2 情境 4 与语言信号『怎么透过现象看本质』"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我们压根没有一手材料，可现在就得拍板，是不是必须先去做一轮调查？",
+      "expected_behavior": "不应激活 material-refinement，应激活 investigation-method（调查研究法）；按 B 段，材料本身不足时四道工序加工不出不存在的材料，须先补调查",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：都涉及『材料/调研』，但此处是材料不足、问要不要先取证，属 investigation-method（二者 composes-with）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我想复盘这次行动的成败，把经验总结成规律，还要判断该不该再试一轮，这个该怎么想？",
+      "expected_behavior": "不应激活 material-refinement，应激活 practice-cognition-loop（实践—认识—再实践循环与两次飞跃）；本 skill 只是其中第一次飞跃内部的具体工序，此处是覆盖两次飞跃的整体框架",
+      "notes": "跨 skill 混淆诱饵：都关涉『从经验到规律』，但此处是完整的实践—认识循环与是否迭代，属 practice-cognition-loop（二者 composes-with）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我把这个 Excel 表格转成 CSV 格式，列顺序别变。",
+      "expected_behavior": "纯格式转换，不应激活任何分析类 skill",
+      "notes": "诱饵：完全无关场景（纯数字/格式处理，非辨伪找联系）"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "手上就三份访谈记录，感觉材料太少，现在用那套加工流程还管用吗？",
+      "expected_behavior": "不宜直接套用 material-refinement；按 E 段判停条件，材料太薄时四道工序走完也拿不出判断，应先回到 investigation-method 补取材料再加工",
+      "notes": "边界：方法假设材料已足够，材料明显不足时属 B 段排除，须先补调查"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 investigation-method 与 practice-cognition-loop）+ 1 条 edge_case。全部 should_not_trigger 必须通过。"
+}

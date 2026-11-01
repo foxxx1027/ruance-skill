@@ -1,0 +1,59 @@
+{
+  "skill": "investigation-method",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "老板明天就要我定新产品的方向，可我从没跟目标用户聊过一次，全是拍脑袋想的，要不要先花两周去跑一圈再定？",
+      "expected_behavior": "调用 investigation-method，把调查设为决策前置条件，判断是否具备发言权、定纲目选一线知情者、亲身开讨论式调查会",
+      "notes": "正面场景：情况没弄清就要拍板，命中 A2 情境 1 与语言信号『要不要直接定了』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "团队为方案吵来吵去，全靠我觉得、大家都这么说，谁也拿不出一手信息，吵了几天也没结果。",
+      "expected_behavior": "调用 investigation-method，指出结论只能产生于调查之后，先取证再表态，给出开调查会的具体做法（纲目、讨论式、口问手写）",
+      "notes": "正面场景：凭印象与二手消息争论，命中 A2 情境 2"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我想搞清楚一线门店到底出了什么问题，但时间紧，只打算发个问卷、听听区经的汇报就得了。",
+      "expected_behavior": "调用 investigation-method，指出只听层级高或二手汇报不足，应眼睛向下、找亲历的实际工作者当面开讨论式调查会",
+      "notes": "正面场景：想了解一线真实状况却只用问卷/汇报，命中 A2 情境 4"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "十几场用户访谈记录都收上来了，一大堆，信息很多但我理不出头绪，怎么把这些材料变成真正的洞察？",
+      "expected_behavior": "不应激活 investigation-method，应激活 material-refinement（感性材料加工四法，去粗取精/去伪存真/由此及彼/由表及里）；本 skill 负责取到材料，材料到手后的加工归后者",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：都涉及『用户访谈』，但此处材料已在手、问的是加工，属 material-refinement 势力范围"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我没精力做全面摸底，就想挑一两个典型例子看看，但这个样本到底能不能代表整体、数据可不可信？",
+      "expected_behavior": "不应激活 investigation-method，应激活 typical-survey-verification（典型调查与二次检验，解剖麻雀/三不信）；这是本 skill 之下的『选点与二次核对』专门化",
+      "notes": "跨 skill 混淆诱饵：都属调查大类，但此处焦点是选典型与核对可信度，属 typical-survey-verification（与本 skill 为 depends-on 关系）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我查一下今天上海会不会下雨，出门要不要带伞。",
+      "expected_behavior": "纯信息查询，不应激活任何方法论 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "这个改动随时能回滚、成本几乎为零，我是先上线看看效果，还是先花几天做个正式调查再动手？",
+      "expected_behavior": "不应激活 investigation-method；按 B 段，决策可逆、代价极小、时间紧的日常小选择，先做再改往往比先调查更划算",
+      "notes": "边界：区分『不可逆的重决策』与『可逆低代价的小选择』，后者不适用本 skill"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 material-refinement 与 typical-survey-verification）+ 1 条 edge_case。全部 should_not_trigger 必须通过。"
+}

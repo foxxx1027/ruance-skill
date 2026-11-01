@@ -1,0 +1,73 @@
+{
+  "skill": "coverage-guided-fuzzing",
+  "version": "0.1.0",
+  "source_book": "《逆向与漏洞分析》 魏强、武泽慧",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "cf-01",
+      "type": "should_trigger",
+      "prompt": "手上有个处理图片的小程序，喂畸形图片崩过几次，想用 AFL 跑一轮找内存破坏，种子和插桩该怎么准备？",
+      "expected_behavior": "应激活 coverage-guided-fuzzing，并插桩编译（带 ASan）、准备合法图片种子、用边覆盖启动闭环并收集崩溃样本。",
+      "notes": "典型触发（常规输入通道 + 内存破坏目标）。防与 directed fuzz 混淆：有正常文件输入，先走通用覆盖率引导。"
+    },
+    {
+      "id": "cf-02",
+      "type": "should_trigger",
+      "prompt": "fuzz 跑了两天没有新边，样本也换过，怎么判断是卡在校验和、关键字段没覆盖，还是调度策略有问题？",
+      "expected_behavior": "应激活 coverage-guided-fuzzing，并按闭环逐环排查种子多样性、校验/格式门槛、覆盖信号与调度能量分配，给出停滞原因。",
+      "notes": "典型触发（覆盖停滞诊断）。防与 symbolic-execution 混淆：先诊断 fuzz 闭环，不直接求解分支。"
+    },
+    {
+      "id": "cf-03",
+      "type": "should_trigger",
+      "prompt": "我的 fuzz 已经 coverage plateau、no new edges，崩溃样本还堆了一堆，想先做 crash triage 和去重，该怎么分？",
+      "expected_behavior": "应激活 coverage-guided-fuzzing，并按模块/函数偏移、调用栈与异常码去重分组，再对每组做可利用性初判。",
+      "notes": "英文 trigger 触发。防与漏洞定性混淆：本步是崩溃去重与初判，不写完整利用链。"
+    },
+    {
+      "id": "cf-04",
+      "type": "should_trigger",
+      "prompt": "有个程序能读文件，想找缓冲区溢出，但它每次启动都校验文件头，改几个字节就被拒绝，这种该怎么下手？",
+      "expected_behavior": "应激活 coverage-guided-fuzzing，并先定位文件头校验与长度字段，在变异后重算回填或按格式生成合法骨架，再进入覆盖引导。",
+      "notes": "无术语但情境相同（格式门槛）。防“直接随机变异”；先解决入口校验。"
+    },
+    {
+      "id": "cf-05",
+      "type": "should_not_trigger",
+      "prompt": "我只有一个驱动的 DeviceIoControl 接口，没有文件输入，想测它的解析函数有没有越界，该怎么搞？",
+      "expected_behavior": "不应激活本 skill，应激活 directed-memory-kernel-fuzzing，因为常规输入通道不可达，目标是内核/驱动接口的定向测试。",
+      "notes": "跨 skill 诱饵（内核/驱动 fuzz）。这是 B 段“输入通道不可达”的硬边界。"
+    },
+    {
+      "id": "cf-06",
+      "type": "should_not_trigger",
+      "prompt": "fuzz 卡在一个魔数比较上，我想要的是直接解出能通过校验的具体输入，不想再扩大变异量，也不想调种子。",
+      "expected_behavior": "不应激活本 skill，应激活 symbolic-execution，因为用户明确要求用约束求解生成能过比较的输入，而非继续覆盖率引导变异。",
+      "notes": "跨 skill 诱饵（符号执行生成输入）。防把“卡住”都留在 fuzz 侧；需解具体约束时转 symbolic。"
+    },
+    {
+      "id": "cf-07",
+      "type": "should_not_trigger",
+      "prompt": "这个后台接口把普通用户当管理员用，不登录也能删别人的数据，我想用 fuzz 跑出来，AFL 该怎么配？",
+      "expected_behavior": "不应激活本 skill，应激活 none，因为这是权限/逻辑漏洞，不产生内存崩溃信号，覆盖率 fuzz 的 oracle 看不到，应改人工审计或业务逻辑测试。",
+      "notes": "跨 skill 诱饵（逻辑漏洞）。B 段明确不适用；防“有输入就能 fuzz”。"
+    },
+    {
+      "id": "cf-08",
+      "type": "edge_case",
+      "prompt": "程序能收文件，但只有一个合法种子，格式还带 CRC；我已经找到 CRC 算法了，这样还能用覆盖率引导 fuzz 吗？",
+      "expected_behavior": "应激活 coverage-guided-fuzzing，但限定为单种子起步、变异后重算 CRC 回填，并优先扩充合法种子，避免长期停在入口解析。",
+      "notes": "边界应调用：目标与通道成立，但种子少且存在校验门槛；需说明补偿条件。"
+    },
+    {
+      "id": "cf-09",
+      "type": "edge_case",
+      "prompt": "目标不接收任何文件或网络输入，数据都是它在内存里自己生成的，我想直接跑覆盖率 fuzz 挖漏洞，行不行？",
+      "expected_behavior": "不应激活本 skill，应激活 directed-memory-kernel-fuzzing，因为输入通道不可达，需转内存/定向 fuzz 而不是常规覆盖率引导。",
+      "notes": "边界不应调用：输入通道不可达，属于 B 段硬边界。"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "共 9 条：4 should_trigger（2 典型、1 英文 trigger、1 无术语同情境）+ 3 should_not_trigger（内核/驱动 fuzz、符号执行生成输入、逻辑漏洞）+ 2 edge_case（单种子+CRC 门槛仍可做但需限定；输入通道不可达）。诱饵容错为 0，核心分界是“真实执行+覆盖反馈”与“约束求解/内核定向/非崩溃类逻辑漏洞”。"
+}

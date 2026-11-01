@@ -1,0 +1,73 @@
+{
+  "skill": "strategic-contempt-tactical-seriousness",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们要去跟行业老大正面竞争，人家资源是我们的十倍，到底敢不敢上？",
+      "expected_behavior": "调用 strategic-contempt-tactical-seriousness，分离战略本质层（纸老虎、确立信心）与战术具体层（真老虎、认真准备），两面成对",
+      "notes": "正面场景：面对远强对手敢不敢入局，命中 A2 情境 1 与『对手太强了要不要上』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "团队刚赢了一单大的，现在有点飘，觉得对手不过如此，我该怎么给大家校准一下？",
+      "expected_behavior": "调用该 skill，提醒只有『藐视』半句会变成冒险轻敌，补上战术层的认真准备，两面成对",
+      "notes": "正面场景：赢了就膨胀需要校准，命中 A2 情境 3 与『赢了之后有点飘』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "被对手的声势吓住了，团队都说这场没法打，是不是我们必输？",
+      "expected_behavior": "调用该 skill，从战略本质层看清对手的长期弱点、重建信心，同时战术层仍认真应对",
+      "notes": "正面场景：被对手声势吓住、畏敌不前，命中 A2 情境 4"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "我想跟团队同时讲清『战略上要有信心』和『战术上要认真』，怎么把握这个度？",
+      "expected_behavior": "调用该 skill，检查两面是否成对（只纸老虎=轻敌、只真老虎=畏敌），并落到一次具体行动上",
+      "notes": "正面场景：要同时传递两个信号，命中 A2 情境 5"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "要不要先做个资金断裂的最坏预案、留好退路再说？",
+      "expected_behavior": "不应激活该 skill，应激活 worst-case-preparation；那是具体的风险管理动作，本 skill 是『本质—现象』两层心态与判断框架",
+      "notes": "跨 skill 混淆诱饵：都涉及面对强对手/不确定，但焦点是风险预案而非心态双层"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "这仗要不要现在打、一次定输赢、梭哈一把大的？",
+      "expected_behavior": "不应激活该 skill，应激活 favorable-decisive-battle；后者管『要不要发起决战式行动』",
+      "notes": "跨 skill 混淆诱饵：都涉及对抗中的决策，但焦点是决战取舍"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我看看这段 Python 代码为什么一直报错。",
+      "expected_behavior": "纯技术任务，不应激活任何方法论 skill",
+      "notes": "诱饵：无对抗对象的纯技术场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我就是在自己做一件事，比如学一门新技能，没什么对手，要不要也来点『战略藐视』？",
+      "expected_behavior": "不应激活该 skill；B 段指出纯技术性、无对抗对象的任务，硬套『敌人』框架会制造不必要的对抗感",
+      "notes": "边界：区分『对抗性竞争』与『无对抗对象的任务』"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我们跟一个长期合作伙伴要谈个平等合作的事，要不要把对方当『纸老虎』来评估一下？",
+      "expected_behavior": "不应激活该 skill；B 段指出需要就事论事的平等合作、长期伙伴关系，把对方设为『敌人』会损害关系",
+      "notes": "边界：区分『对抗性对手』与『平等合作的长期伙伴』"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 worst-case-preparation 与 favorable-decisive-battle）+ 2 条 edge_case。全部 should_not_trigger 必须通过。"
+}

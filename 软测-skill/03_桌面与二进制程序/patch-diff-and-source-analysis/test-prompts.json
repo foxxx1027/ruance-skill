@@ -1,0 +1,76 @@
+{
+  "skill": "patch-diff-and-source-analysis",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "st-01",
+      "type": "should_trigger",
+      "prompt": "厂商只发了补丁、公告里只有一句模糊描述，怎么判断它修的到底是越界、UAF 还是类型混淆？",
+      "expected_behavior": "调用 patch-diff-and-source-analysis；用差异形状（长度/边界比较、释放后置空、类型标记、分配尺寸）映射漏洞类型，并指向具体被改指令。",
+      "notes": "《漏洞战争》差异形状判型。"
+    },
+    {
+      "id": "st-02",
+      "type": "should_trigger",
+      "prompt": "BinDiff 跑出来函数一个都对不上，全是 sub_XXXX，还有别的办法定位被改的函数吗？",
+      "expected_behavior": "调用 patch-diff-and-source-analysis；给出两条退路——函数数组+索引*4 定位，或特征指令序列在邻近地址搜索。",
+      "notes": "《漏洞战争》BinDiff 失配退路。"
+    },
+    {
+      "id": "st-03",
+      "type": "should_trigger",
+      "prompt": "我想对某个旧版本做源码级调试，但官方符号服务器没有对应版本，怎么办？",
+      "expected_behavior": "调用 patch-diff-and-source-analysis；按三级降级：官方符号→自编译 debug 产物（工具链贴近源码年代）→退回汇编级。",
+      "notes": "《漏洞战争》符号失效三级降级。"
+    },
+    {
+      "id": "st-04",
+      "type": "should_trigger",
+      "prompt": "微软月度补丁出来了，只有 KB 号。我想取补丁前后的 tcpip.sys 做 1-day 验证，旧版本该选哪个、MSU 包怎么解？",
+      "expected_behavior": "调用 patch-diff-and-source-analysis；先查 Updates Replaced 取最近前驱版本，按 MSU→CAB 解包并留档，再做 BinDiff 分诊与动态验证。",
+      "notes": "《灰帽黑客》1-day 实战流水线，覆盖基线选择与解包。"
+    },
+    {
+      "id": "snt-01",
+      "type": "should_not_trigger",
+      "prompt": "面对一个完全未知的 0-day，我应该先 fuzz 还是先读源码？想先定一下整体分析路线。",
+      "expected_behavior": "不应触发本 skill；应调用 fuzzing-strategy 决定先 fuzz 还是先读源码的整体路线（vuln-analysis-strategy 亦可）。",
+      "notes": "诱饵：尚未选定方法，属于前置策略判断。复测修正：题目字面就是“先 fuzz 还是先读源码”，fuzzing-strategy 的选型职责同样成立。"
+    },
+    {
+      "id": "snt-02",
+      "type": "should_not_trigger",
+      "prompt": "帮我审一下这个开源项目的源码，找内存破坏类漏洞，不是看某个补丁。",
+      "expected_behavior": "不应触发本 skill；应调用 source-and-binary-static-audit 做无补丁对照的源码/二进制静态审计。",
+      "notes": "跨 skill 诱饵：没有修复前后对照，不属于补丁比较。"
+    },
+    {
+      "id": "snt-03",
+      "type": "should_not_trigger",
+      "prompt": "我已经从补丁反推出漏洞位置和类型了，现在想写成能稳定绕过 ASLR 的 exploit。",
+      "expected_behavior": "不应触发本 skill；应调用 exploit-chain-construction 进入信息泄露与利用链构造阶段。",
+      "notes": "跨 skill 诱饵：本 skill 只到可利用性判定，不做完整利用链。"
+    },
+    {
+      "id": "ec-01",
+      "type": "edge_case",
+      "prompt": "这个补丁里改了一大片代码，还有重构和日志改动，我怎么判断哪一处才是真正的安全修复？",
+      "expected_behavior": "调用 patch-diff-and-source-analysis；先按公告语义、符号名、外部可达性分诊，再用差异形状筛安全相关改动，不能把整片改动都当漏洞。",
+      "notes": "边界：功能改动与安全修复混杂时的噪声控制。"
+    },
+    {
+      "id": "ec-02",
+      "type": "edge_case",
+      "prompt": "开源项目有 git diff，是不是直接看 diff 就能确定漏洞了？",
+      "expected_behavior": "调用 patch-diff-and-source-analysis 的源码路径；先确认修复版本，只读被改函数及必要上下文，并区分安全修复与普通改动，不能把 diff 等同于漏洞。",
+      "notes": "边界：源码 diff 是入口，不是结论。"
+    },
+    {
+      "id": "ec-03",
+      "type": "edge_case",
+      "prompt": "1-day 验证做到程序能崩就够了吗，还是必须继续把利用链也写出来？",
+      "expected_behavior": "调用 patch-diff-and-source-analysis；按“差异真实、可达、控制流影响”判停，结论可停在确认/疑似，不擅自展开完整利用链；需要 ROP/leak 时转 exploit-chain-construction。",
+      "notes": "边界：1-day 验证的深度与交接点。"
+    }
+  ]
+}

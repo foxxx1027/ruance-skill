@@ -1,0 +1,73 @@
+{
+  "skill": "windows-access-control-attack",
+  "version": "0.1.0",
+  "source_book": "《灰帽黑客 第4版》 — Daniel Regalado 等",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "普通用户发现一个服务目录可写，怎么判断能不能提权？",
+      "expected_behavior": "应激活本 skill，枚举服务配置、可写路径与高权限启动条件，补全确认链",
+      "notes": "正面：服务配置提权"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "用 AccessChk 枚举出某个注册表键可写，接下来怎么找高权限消费方？",
+      "expected_behavior": "应激活本 skill，按对象类型与消费方枚举顺序定位可利用点",
+      "notes": "正面：注册表 ACL"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "令牌里有 SeImpersonatePrivilege，有哪些利用路径？",
+      "expected_behavior": "应激活本 skill，说明令牌特权与命名管道/模拟路径",
+      "notes": "正面：令牌特权"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "这个栈溢出能覆盖 SEH，怎么提权？",
+      "expected_behavior": "不应激活本 skill，应激活同书 windows-exploit-and-mitigation-bypass",
+      "notes": "跨 skill 混淆诱饵（硬性要求）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "Web 应用存在 IDOR，怎么利用？",
+      "expected_behavior": "不应激活本 skill，应走 non-memory-vulnerability-analysis",
+      "notes": "诱饵：应用层越权"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我写一段 DLL 注入的 shellcode",
+      "expected_behavior": "不应激活本 skill，应走 shellcode-engineering",
+      "notes": "诱饵：内存载荷"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "扫描器报告某文件 ACL 可写，能直接定级为高危吗？",
+      "expected_behavior": "应激活本 skill，要求补全“谁消费该文件、是否高权限、是否可达”的确认链",
+      "notes": "边界：扫描命中 vs 可利用"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我是域管理员，想审计哪些 ACL 配置有风险",
+      "expected_behavior": "应激活本 skill 的枚举与判定流程，但目标从提权改为配置审计",
+      "notes": "边界：防御侧使用"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "Linux 上 sudo 配置错误怎么提权？",
+      "expected_behavior": "不应激活本 skill，平台与对象模型不匹配",
+      "notes": "边界：非 Windows 平台"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含至少 1 条同书兄弟 skill 混淆诱饵）+ 3 条 edge_case；全部 should_not_trigger 必须通过。"
+}

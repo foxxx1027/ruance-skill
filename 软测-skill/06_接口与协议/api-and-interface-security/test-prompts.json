@@ -1,0 +1,76 @@
+{
+  "skill": "api-and-interface-security",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "st-01",
+      "type": "should_trigger",
+      "prompt": "我们 Swagger 页面公网能打开，GraphQL introspection 也没关，想按接口把鉴权和限流都过一遍。",
+      "expected_behavior": "调用 api-and-interface-security；先枚举接口与协议，再逐接口检查认证、对象级授权、输入输出、资源控制与文档调试面。",
+      "notes": "文档暴露叠加 API 面系统检查。"
+    },
+    {
+      "id": "st-02",
+      "type": "should_trigger",
+      "prompt": "接口返回的用户对象里有手机号、身份证、内部备注，普通角色也能看到，这种过度暴露怎么查？",
+      "expected_behavior": "调用 api-and-interface-security；对照匿名、普通用户、管理员等视角检查响应字段、分页与导出，定位响应模型与字段过滤缺口。",
+      "notes": "过度数据暴露，属于接口输出面。"
+    },
+    {
+      "id": "st-03",
+      "type": "should_trigger",
+      "prompt": "注册接口传 isAdmin=true 就成管理员了，GraphQL 的 mutation 好像也能改任意字段，这种批量赋值怎么定位？",
+      "expected_behavior": "调用 api-and-interface-security；逐接口列出可写字段与敏感字段生效情况，确认服务端是否使用 schema 或允许列表。",
+      "notes": "批量赋值导致提权，需按接口与字段定位。"
+    },
+    {
+      "id": "st-04",
+      "type": "should_trigger",
+      "prompt": "WebSocket 连接建立后好像不再校验权限，RPC 接口也没有限流，想系统排查 API 层。",
+      "expected_behavior": "调用 api-and-interface-security；覆盖 WebSocket 握手与消息级授权、RPC 方法认证与限流，并检查连接数、订阅数与超时。",
+      "notes": "非 REST 协议同样属于接口面检查。"
+    },
+    {
+      "id": "snt-01",
+      "type": "should_not_trigger",
+      "prompt": "登录后 JWT 的 alg 能改，注销也不失效，这种会话问题怎么查？",
+      "expected_behavior": "不应调用本 skill；应调用 auth-session-and-federation-security 检查 JWT 验签、算法固定、过期与注销撤销。",
+      "notes": "令牌与会话机制本身，不是逐接口检查。"
+    },
+    {
+      "id": "snt-02",
+      "type": "should_not_trigger",
+      "prompt": "接口参数里的 id 导致 SQL 注入，怎么验证？",
+      "expected_behavior": "不应调用本 skill；应调用 non-memory-vulnerability-analysis 按注入类漏洞验证。",
+      "notes": "通用注入不归接口安全检查。"
+    },
+    {
+      "id": "snt-03",
+      "type": "should_not_trigger",
+      "prompt": "优惠券能重复领，并发退款还能多退，这种业务流程怎么查？",
+      "expected_behavior": "不应调用本 skill；应调用 business-logic-and-race-security 按状态机、不变量与并发验证。",
+      "notes": "跨步骤业务规则与竞态，不是接口输入输出。"
+    },
+    {
+      "id": "ec-01",
+      "type": "edge_case",
+      "prompt": "只有一个 GraphQL 端点，没有 schema 也没有账号，能不能先判断风险面？",
+      "expected_behavior": "调用 api-and-interface-security；在不触发写操作的前提下做 introspection 与错误信息只读探测，输出待验证风险清单，不直接断言漏洞。",
+      "notes": "单端点信息不足，只能做只读风险面判断。"
+    },
+    {
+      "id": "ec-02",
+      "type": "edge_case",
+      "prompt": "接口返回 200 但数据是空的，是权限过滤还是本来没数据？",
+      "expected_behavior": "调用 api-and-interface-security；用不同角色与已知存在的测试对象做对照，结合响应差异与日志判断是过滤还是空集。",
+      "notes": "空响应语义不明确，需要差分证据。"
+    },
+    {
+      "id": "ec-03",
+      "type": "edge_case",
+      "prompt": "接口只给内部服务调用，走内网 mTLS，还需要查对象级授权吗？",
+      "expected_behavior": "调用 api-and-interface-security；仍需检查服务调用链中的主体传递与对象级授权，避免内网可信假设造成越权。",
+      "notes": "内网与 mTLS 只证明通道可信，不证明授权正确。"
+    }
+  ]
+}

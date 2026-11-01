@@ -1,0 +1,73 @@
+{
+  "skill": "upload-parser-bypass-audit",
+  "version": "0.1.0",
+  "source_book": "《Web中间件常见漏洞总结》 — lyxhh",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "上传点只允许 jpg/png，传一个 .php.jpg 会不会被当成 PHP 执行？",
+      "expected_behavior": "应激活本 skill，先确认容器与后缀识别规则，再判断存储名与解析名是否分叉",
+      "notes": "正面：上传白名单绕过"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "为什么访问 /upload/info.jpg/xxx.php 会把 info.jpg 当 PHP 跑？",
+      "expected_behavior": "应激活本 skill，沿 Nginx location → FastCGI → cgi.fix_pathinfo 的路径回退链解释",
+      "notes": "正面：fix_pathinfo 路径回退"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "Apache 配了 AddHandler，双后缀还能不能绕过上传白名单？",
+      "expected_behavior": "应激活本 skill，区分 AddHandler（文件名任意位置含 .php）与 mime.types 从右向左识别两种规则",
+      "notes": "正面：AddHandler 解析差异"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "JBoss 的 /invoker/readonly 返回 500，是不是说明存在反序列化漏洞？",
+      "expected_behavior": "不应激活本 skill，应激活同书 java-deserialization-entry-enumeration",
+      "notes": "跨 skill 混淆诱饵（同书兄弟 skill）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "Nginx 开了 autoindex，能看到目录列表，这算不算漏洞？",
+      "expected_behavior": "不应激活本 skill，应激活同书 middleware-misconfig-audit",
+      "notes": "跨 skill 混淆诱饵（同书兄弟 skill）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我改一下图片上传接口，让它正确校验 Content-Type 并压缩图片",
+      "expected_behavior": "不应激活本 skill，这是正常业务开发，不是解析漏洞审计",
+      "notes": "诱饵：应用开发任务"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "服务器把上传文件完全重命名成 UUID.jpg，目录也不可控，还有解析风险吗？",
+      "expected_behavior": "应激活本 skill，说明重命名能切断多数分叉，但仍需确认执行侧是否按内容/路径二次解释，并给出残余检查项",
+      "notes": "边界：服务端已重命名"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "CVE-2013-4547 在 Windows 上复现不了，是不是漏洞不存在？",
+      "expected_behavior": "应激活本 skill，说明该漏洞依赖文件名尾随空格，Windows 不允许，需 Linux/Docker 环境复现",
+      "notes": "边界：平台差异"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "上传目录已经禁止执行脚本了，还需要改 cgi.fix_pathinfo 吗？",
+      "expected_behavior": "应激活本 skill，说明禁执行是主修复，解析规则收敛是纵深防御，两者不是替代关系",
+      "notes": "边界：多层修复的关系"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含 2 条同书兄弟 skill 混淆诱饵）+ 3 条 edge_case；全部 should_not_trigger 必须通过。"
+}

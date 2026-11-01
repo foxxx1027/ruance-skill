@@ -1,0 +1,59 @@
+{
+  "skill": "object-design-immutability",
+  "version": "0.1.0",
+  "source_book": "信息安全技术 应用软件安全编程指南（GB/T 38674-2020） — 国家市场监督管理总局、国家标准化管理委员会",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "配置类的 getter 直接把内部的 ArrayList 返回出去了，同事说外面能随便改，是这样吗？",
+      "expected_behavior": "应激活 object-design-immutability，并指出返回的是内部可变成员引用，要求改为返回副本或不可变视图，再逐个核对其他 getter。",
+      "notes": "正面场景：getter 泄露内部可变集合，是该 skill 的核心触发点。"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "订单对象的金额字段有 public setter，我担心校验通过后又被改掉，这种要怎么设计？",
+      "expected_behavior": "应激活 object-design-immutability，并先写出金额与状态的不变量，再封住写入路径（字段私有、写操作经封装器重做校验），必要时做快照避免校验与使用之间被改。",
+      "notes": "正面场景：含金额字段的领域对象 + 校验后可变，对应不变量与 TOCTOU。"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "Our SDK hands out the internal byte array holding the key — is returning that reference actually safe?",
+      "expected_behavior": "应激活 object-design-immutability，并说明返回数组引用等于交出可写入口，应返回克隆副本或改为不可变封装，同时评估含密钥的类是否应可复制、可序列化。",
+      "notes": "英文正向场景：SDK 暴露密钥字节数组，测试双语触发与防御性复制判断。"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "基类构造函数里调用了一个 public 的 init 方法，子类重写后拿到的是 null，为什么？",
+      "expected_behavior": "应激活 object-design-immutability，并解释构造期调用可覆写方法会把未初始化完的对象暴露给子类，要求把该方法改为 final 或 private。",
+      "notes": "正面场景：继承破坏不变量、半初始化对象逸出，对应书中的构造期可覆写方法案例。"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "多线程共享一个 HashMap，压测时偶尔抛 ConcurrentModificationException，加锁该加在哪？",
+      "expected_behavior": "不应激活本 skill，应激活 concurrency-safety，因为问题在于多个线程读写同一份共享可变数据时的同步与可见性，而不是类有没有给出可写入口。",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：共享集合的并发修改应交给 concurrency-safety，防止本 skill 只看到“集合泄露”就抢调用。"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "Lombok 的 @Data 生成的 equals 在继承时不对称，这种代码风格问题怎么改？",
+      "expected_behavior": "不应激活本 skill，因为它只是普通对象方法语义与代码风格问题，不涉及不变量、封装泄露或安全关键方法被覆写。",
+      "notes": "诱饵：对象设计话题但不涉及安全属性，检验是否会因“类的设计”字样误触发。"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "DTO 只用来接前端传的 JSON，字段全是 String，还有必要在 getter 里返回副本吗？",
+      "expected_behavior": "通常不应激活本 skill，只做一句确认即可：无共享状态、不跨信任边界的纯传输结构不适用；若该 DTO 含金额或权限字段、会被缓存复用或跨线程共享，则再按 object-design-immutability 检查不变量与读出路径。",
+      "notes": "边界：判断“纯数据袋”与“需要保护不变量的领域对象”的分界，避免对无共享状态的结构过度设计。"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条正向覆盖 getter 泄露、金额不变量、SDK 密钥数组（英文）、构造期覆写；2 条诱饵中 1 条为兄弟 skill concurrency-safety 场景，另 1 条为非安全的对象方法语义问题；边界题检验纯 DTO 是否应被排除。所有 should_not_trigger 必须通过。"
+}

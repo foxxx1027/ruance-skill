@@ -1,0 +1,59 @@
+{
+  "skill": "file-and-upload-safety",
+  "version": "0.1.0",
+  "source_book": "信息安全技术 应用软件安全编程指南（GB/T 38674-2020） — 国家市场监督管理总局、国家标准化管理委员会",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "下载接口把 filename 直接拼进 new File(base, name)，同事说能读到 /etc/passwd",
+      "expected_behavior": "应激活 file-and-upload-safety，并先对路径做标准化（相对段、绝对路径、符号链接、编码），再与允许根目录比较，且校验与打开必须针对同一对象；更稳妥是改为预置资源名索引。",
+      "notes": "正面场景：外部文件名直接进入文件 API，是路径语义混用的典型案例。"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "头像上传只判断了扩展名是不是 jpg/png，评审说这样不行，还得查什么？",
+      "expected_behavior": "应激活 file-and-upload-safety，并给出上传四闸：上传前鉴别身份、扩展名与文件报头双检、访问前恶意代码扫描与完整性校验、上传目录禁执行；落盘重命名并隔离存储。",
+      "notes": "正面场景：只校验扩展名的上传绕过风险。"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "We unzip user-uploaded archives into a temp dir — how do we stop entries containing ../ from escaping?",
+      "expected_behavior": "应激活 file-and-upload-safety，并要求逐条目规范化后再与目标根目录比较，拒绝绝对路径、符号链接与越界条目，同时限制解压总量与条目数。",
+      "notes": "英文正向场景：压缩包解压条目逃逸，测试双语触发。"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "导入功能要在 /tmp 下生成临时 Excel，用随机文件名，还需要管权限和删除吗？",
+      "expected_behavior": "应激活 file-and-upload-safety，并要求启动时以严格权限建独立临时目录、只对本应用开放，存活时间最小化、用完即删，不能只靠退出钩子兜底。",
+      "notes": "正面场景：临时文件的权限与生命周期约束。"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "对象存储的预签名 URL 换个 key 就能下别人的文件，权限该怎么设计？",
+      "expected_behavior": "不应激活本 skill，应激活 authorization-and-least-privilege，因为问题在于下载者对具体对象是否获得授权，属于对象级越权与最小权限设计，而不是路径规范化或文件类型校验。",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：文件下载话题极易被本 skill 抢走，但换 key 可下载是典型对象级越权。"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "大文件直传对象存储经常超时，要不要改成分片上传？",
+      "expected_behavior": "不应激活本 skill，因为这是传输性能与可靠性优化，不涉及路径信任、上传类型校验、落盘位置或临时文件安全。",
+      "notes": "诱饵：带“上传”关键词但属性能优化，检验是否会仅凭关键词误触发。"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "图片走前端直传对象存储，服务端不落盘，是不是就不用校验文件类型了？",
+      "expected_behavior": "应激活 file-and-upload-safety：直传只改变落盘位置，不改变类型校验要求，仍需扩展名与文件报头双检、访问前扫描与隔离、禁用执行；桶策略与预签名授权不在本 skill 范围，另交 authorization-and-least-privilege。",
+      "notes": "边界：对象存储直传场景，检验是否会因“服务端不落盘”误判为不适用，同时明确桶策略的归属。"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条正向覆盖路径拼接、上传类型双检、解压逃逸（英文）、临时文件；2 条诱饵中 1 条为兄弟 skill authorization-and-least-privilege 的对象越权场景，另 1 条为分片上传性能问题；边界题检验对象存储直传仍属本 skill。所有 should_not_trigger 必须通过。"
+}

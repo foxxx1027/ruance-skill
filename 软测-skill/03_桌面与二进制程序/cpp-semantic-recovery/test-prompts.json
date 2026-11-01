@@ -1,0 +1,73 @@
+{
+  "skill": "cpp-semantic-recovery",
+  "version": "0.1.0",
+  "source_book": "《逆向与漏洞分析》 魏强、武泽慧",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "csr-01",
+      "type": "should_trigger",
+      "prompt": "Release版的函数里变量全没了，一个循环被拆得七零八落，这段汇编到底对应什么C++写法？",
+      "expected_behavior": "应激活 cpp-semantic-recovery，并先划分函数边界与栈帧，再逐项还原局部变量类型、表达式、循环结构和优化痕迹，输出语义摘要与不确定项。",
+      "notes": "典型触发：Release 优化后变量消失、结构被打散，对应 A2 第 1 条。"
+    },
+    {
+      "id": "csr-02",
+      "type": "should_trigger",
+      "prompt": "反汇编里明明是除以3，怎么变成乘以一个魔数再右移了，这是编译器优化还是程序被改过？",
+      "expected_behavior": "应激活 cpp-semantic-recovery，并按 magic number 乘法取高位加移位的模式还原出原除法表达式，说明这是编译器把慢指令换成等价快指令。",
+      "notes": "典型触发：除法被优化成乘法与移位，对应 A2 第 2 条与 I 段表达式还原线。"
+    },
+    {
+      "id": "csr-03",
+      "type": "should_trigger",
+      "prompt": "Decompile this stripped x86 function and tell me if the variable is signed or unsigned.",
+      "expected_behavior": "应激活 cpp-semantic-recovery，并从比较指令、乘除版本与调用方式反推变量宽度和符号性，同时标注类型歧义与需运行时裁决的项。",
+      "notes": "英文触发：含 decompile、signed or unsigned、x86，命中 description 中的英文信号。"
+    },
+    {
+      "id": "csr-04",
+      "type": "should_trigger",
+      "prompt": "这程序没有源码，一段循环里跳来跳去，我看不出原来写的是for还是while，也不知道那个变量占几个字节。",
+      "expected_behavior": "应激活 cpp-semantic-recovery，并按跳转条数与位置判定循环类型，按内存访问宽度与连续性判定变量宽度和数组范围。",
+      "notes": "不含“语义还原”“反编译”等术语，但问的正是控制结构与类型还原，用于检验情境识别而非关键词匹配。"
+    },
+    {
+      "id": "csr-05",
+      "type": "should_not_trigger",
+      "prompt": "我只有一个没符号的exe，领导没说交付什么，我想先知道该逆到哪一层、要不要还原全部源码。",
+      "expected_behavior": "不应激活本 skill，应激活 reverse-engineering-workflow，因为用户在问分析目标、交付物与深度，而不是某段汇编的具体语义。",
+      "notes": "跨 skill 诱饵：防把“要不要还原源码”误判为“开始还原语义”；本 skill 只在目标与深度确定后接手。"
+    },
+    {
+      "id": "csr-06",
+      "type": "should_not_trigger",
+      "prompt": "这个样本IDA里函数全是红的、地址跳飞，我怀疑有花指令，可连真实入口都找不到。",
+      "expected_behavior": "不应激活本 skill，应激活 anti-debugging-and-unpacking，因为反汇编已被花指令或壳破坏，必须先恢复干净的反汇编与入口。",
+      "notes": "跨 skill 诱饵：防把“IDA 反汇编错乱”当成普通语义还原问题；脏输入下做模式匹配必然误判。"
+    },
+    {
+      "id": "csr-07",
+      "type": "should_not_trigger",
+      "prompt": "帮我查一下C++里std::vector的push_back在哪个头文件里声明。",
+      "expected_behavior": "不应激活本 skill，应激活 none，因为这是语言资料查询，不涉及二进制反汇编与语义还原。",
+      "notes": "完全无关诱饵：检验不会因出现 C++ 字样就启动语义还原流程。"
+    },
+    {
+      "id": "csr-08",
+      "type": "edge_case",
+      "prompt": "同一块内存，汇编里一处按字节比较、一处按双字比较，我判断不了它是int还是char，能不能先用调试器确认再还原？",
+      "expected_behavior": "应激活 cpp-semantic-recovery，并先按步骤 3 标记类型歧义，再用调试器核对宽度与符号性后回填类型；限定条件是不能只凭单条指令定型。",
+      "notes": "边界上应调用：命中“同一地址被不同宽度或符号方式访问”的判停条件，属于本 skill 内部用运行时证据裁决的边界，而非转去调试类 skill。"
+    },
+    {
+      "id": "csr-09",
+      "type": "edge_case",
+      "prompt": "这是ARM64的二进制，没有源码，想直接套书里的EBP+8和eax模板来还原参数个数。",
+      "expected_behavior": "不应激活本 skill，应激活 none（需先按 ARM64 调用约定重新校准模式库），因为本 skill 的栈帧、参数位置与返回值模板以 32 位 x86 cdecl 为基准，不能照搬。",
+      "notes": "边界上不应调用：命中 B 段 ARM64/非 x86 调用约定的硬排除条件，检验不会把 x86 模板硬套到其他架构。"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "9 条用例按 4/3/2 配比：2 条典型（Release 优化读不懂、magic number 除法）、1 条英文、1 条无术语同情境；3 条不触发中 2 条分别诱向 reverse-engineering-workflow 与 anti-debugging-and-unpacking，另 1 条为语言资料查询；2 条边界分别检验“类型歧义时如何用运行时证据裁决”和“ARM64 不得照搬 x86 模板”。跨 skill 诱饵只指向唯一正确 skill，容错为 0。"
+}

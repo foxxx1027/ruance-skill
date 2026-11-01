@@ -1,0 +1,59 @@
+{
+  "skill": "favorable-decisive-battle",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "对手是行业巨头，我们融的钱也就够撑一年，要不要把全部资金押上去打一场决定性的价格战，一次把他们打服？",
+      "expected_behavior": "调用 favorable-decisive-battle，识别这属于『赌上全部身家/生存』的命运之战，无论胜算看似多高都判为根本避免，并改写成一串有把握的局部行动",
+      "notes": "正面场景：倾尽全部资源打决定性一仗，命中 A2 情境 1 与语言信号『all in』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "这个项目前前后后已经亏进去很多了，我不甘心，想再赌一把更大的把本翻回来，这个念头到底该不该干？",
+      "expected_behavior": "调用 favorable-decisive-battle，指出这是『翻本式』不可逆押注，应避免，并给出以小胜积累逐步改变力量对比的替代路径，而非什么都不做",
+      "notes": "正面场景：输了不甘心、想加大赌注翻本，命中 A2 情境 4"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "接下来这一年，是应该小步快跑一点点攒优势，还是找个机会毕其功于一役、一次把胜负分出来？",
+      "expected_behavior": "调用 favorable-decisive-battle，把候选『决战』按把握程度分三类处置，排除赌命运的选项，并说明为何选逐步积累路线",
+      "notes": "正面场景：逐步取胜 vs 一次决胜的路线选择，命中 A2 情境 5 与『毕其功于一役』"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "这个决定要是错了损失挺大，我在纠结要不要现在就动，还是先做好最坏的打算、给自己留个后手再出手？",
+      "expected_behavior": "不应激活 favorable-decisive-battle，应激活 worst-case-preparation（向最坏可能准备、留后手/预案）；本 skill 管『这次摊牌要不要打、尤其排除 all-in』，此处焦点是事前的最坏准备与是否待机",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：都涉及『要不要现在出手』，但此处核心是风险预案/后手，属 worst-case-preparation（二者 composes-with）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "对手看起来比我们强太多，我既想入这个局又怕自己轻敌，这种心态上该怎么摆正？",
+      "expected_behavior": "不应激活 favorable-decisive-battle，应激活 strategic-contempt-tactical-seriousness（战略藐视、战术重视的双层心态）；本 skill 是行动层面的取舍，此处是心态与判断分层",
+      "notes": "跨 skill 混淆诱饵：都出现在『面对强敌要不要上』的语境，但此处问的是心态成对使用，属纸老虎双层判断"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我写一封向下周会议请假的邮件，语气正式一点。",
+      "expected_behavior": "纯文书写作，不应激活任何战略决策类 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们想花三个月试做一个新功能，做不成也就损失点人力，公司完全承受得起，这种要不要也先掂量掂量打不打？",
+      "expected_behavior": "不应激活 favorable-decisive-battle；按 B 段，后果可逆、损失可承受的试验性决策套用本方法会变成不敢试错，直接大胆试即可",
+      "notes": "边界：区分『不可逆的生存性押注』与『可逆的试验性下注』——后者不适用本 skill"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 worst-case-preparation 与 strategic-contempt-tactical-seriousness）+ 1 条 edge_case。全部 should_not_trigger 必须通过。"
+}

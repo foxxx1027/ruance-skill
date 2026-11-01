@@ -1,0 +1,73 @@
+{
+  "skill": "fuzzing-engineering-peach",
+  "version": "0.1.0",
+  "source_book": "《灰帽黑客 第4版》 — Daniel Regalado 等",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我要对 PDF 阅读器做 fuzz，怎么挑种子并做最小集？",
+      "expected_behavior": "应激活本 skill，说明覆盖跟踪评分、种子最小集与会话配置",
+      "notes": "正面：种子工程"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "Peach Pit 的 DataModel 和 StateModel 怎么写，才能覆盖多步协议？",
+      "expected_behavior": "应激活本 skill，给出 Pit 建模与状态机配置步骤",
+      "notes": "正面：Pit 建模"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "fuzz 出了一堆崩溃，怎么 triage、去重、判断哪些值得继续？",
+      "expected_behavior": "应激活本 skill，按可复现性、唯一崩溃点与可控性做 triage",
+      "notes": "正面：崩溃 triage"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "不知道该用静态审计还是 fuzz，帮我选路线",
+      "expected_behavior": "不应激活本 skill，应走 fuzzing-strategy 做技术选型",
+      "notes": "诱饵：选型阶段"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "帮我从补丁差异反推这个漏洞的根因",
+      "expected_behavior": "不应激活本 skill，应激活同书 patch-diff-1day-workflow",
+      "notes": "跨 skill 混淆诱饵（硬性要求）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "这个畸形 PDF 一打开就崩，帮我反推文件格式并构造最小 POC",
+      "expected_behavior": "不应激活本 skill，应走 file-format-vulnerability-reversing",
+      "notes": "诱饵：格式逆向"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "AFL 跑了两天覆盖率不涨，怎么办？",
+      "expected_behavior": "不应激活 Peach 工程流程，应走 coverage-guided-fuzzing 检查反馈闭环与种子质量",
+      "notes": "边界：覆盖率引导 fuzz 的故障排查"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "Peach 和 AFL 应该怎么选？",
+      "expected_behavior": "不应激活本 skill 的工程配置，应先走 fuzzing-strategy 做工具选型",
+      "notes": "边界：工具选型 vs 已决定后的落地"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "目标协议要先登录再发命令，怎么建模才能 fuzz 到后续状态？",
+      "expected_behavior": "应激活本 skill，用 StateModel 建模登录与状态迁移",
+      "notes": "边界：多步协议 fuzz"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含至少 1 条同书兄弟 skill 混淆诱饵）+ 3 条 edge_case；全部 should_not_trigger 必须通过。"
+}

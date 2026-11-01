@@ -1,0 +1,76 @@
+{
+  "skill": "crash-to-root-cause",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "st-01",
+      "type": "should_trigger",
+      "prompt": "程序崩在 ntdll 里，OllyDbg 的 Call Stack 全是非法地址，怎么回到我自己代码里的漏洞函数？",
+      "expected_behavior": "调用 crash-to-root-cause；先判断栈是否已破坏，用受控崩溃或硬件写断点取得有效中断，再把系统崩溃逐层翻译成被测代码的函数。",
+      "notes": "覆盖《漏洞战争》的栈回溯与《0day安全》的栈已毁场景。"
+    },
+    {
+      "id": "st-02",
+      "type": "should_trigger",
+      "prompt": "我在分发函数上下了断点，结果被轮流调用上千次，根本没法判断是哪一次算出了异常值。",
+      "expected_behavior": "调用 crash-to-root-cause；改用条件记录断点，把指令索引、虚拟栈顶等参数逐次写入日志，取最后一次记录对齐输入。",
+      "notes": "《漏洞战争》条件记录断点路径，典型高频调用场景。"
+    },
+    {
+      "id": "st-03",
+      "type": "should_trigger",
+      "prompt": "POC 能让程序稳定崩，EIP 被 41414141 覆盖，但漏洞函数在哪、是哪条写指令、到返回地址多少字节都不知道。",
+      "expected_behavior": "调用 crash-to-root-cause；先造受控崩溃读指纹，再用栈回溯或硬件写断点定位写指令，并用地址差实测覆盖长度。",
+      "notes": "《0day安全》溢出定位主场景，四个待答问题齐全。"
+    },
+    {
+      "id": "st-04",
+      "type": "should_trigger",
+      "prompt": "已经定位到一个可疑函数了，但缓冲区到底多大、覆盖到返回地址要多少字节还是说不清，怎么精确量？",
+      "expected_behavior": "调用 crash-to-root-cause；在分配/SUB ESP 之后对缓冲区下硬件写断点，读目的地址作为缓冲区起点，再与返回地址相减。",
+      "notes": "《0day安全》精确偏移测量，属于定位后半程。"
+    },
+    {
+      "id": "snt-01",
+      "type": "should_not_trigger",
+      "prompt": "我手上只有补丁前后的两个 DLL，没有 POC 也没有可复现输入，想知道厂商到底修了什么。",
+      "expected_behavior": "不应触发本 skill；应调用 patch-diff-and-source-analysis，用补丁差异反推被修函数。",
+      "notes": "跨 skill 诱饵：有补丁时补丁比较优先。"
+    },
+    {
+      "id": "snt-02",
+      "type": "should_not_trigger",
+      "prompt": "崩溃在 RtlpFreeHeap，堆块头被改写，怀疑是 UAF，想查清这个块是谁释放的。",
+      "expected_behavior": "不应触发本 skill；应调用 heap-vulnerability-locating，用页堆、堆尾检查与分配记录定位。",
+      "notes": "跨 skill 诱饵：破坏对象是堆元数据时栈回溯不适用。"
+    },
+    {
+      "id": "snt-03",
+      "type": "should_not_trigger",
+      "prompt": "偏移已经量出来了，现在想选跳板、铺 NOP sled，把 shellcode 放到合适位置。",
+      "expected_behavior": "不应触发本 skill；应调用 win-stack-overflow-exploit 做布局、跳板与容错设计。",
+      "notes": "跨 skill 诱饵：定位完成后的利用构造属于下一阶段。"
+    },
+    {
+      "id": "ec-01",
+      "type": "edge_case",
+      "prompt": "程序会崩，但十次里只崩一次，我能不能直接拿这几次崩溃来量覆盖长度和偏移？",
+      "expected_behavior": "调用 crash-to-root-cause，但第一步必须是稳定复现与造受控崩溃；消除环境变量后仍不稳定则停止定位、转复现工程，不能用偶发崩溃算偏移。",
+      "notes": "边界：可复现性是量偏移的前提。"
+    },
+    {
+      "id": "ec-02",
+      "type": "edge_case",
+      "prompt": "栈回溯出来的全是垃圾值，帧链也断了，是不是只能放弃定位了？",
+      "expected_behavior": "调用 crash-to-root-cause；改走替代路径——硬件写断点直达写指令，或利用样本中硬编码的 ROP 指令地址作锚点反向追踪。",
+      "notes": "边界：栈失效不等于不可定位，要切换路径。"
+    },
+    {
+      "id": "ec-03",
+      "type": "edge_case",
+      "prompt": "同一个 POC 远程能打通、本地复现不了，是不是说明我偏移算错了，只能靠多试几次？",
+      "expected_behavior": "调用 crash-to-root-cause；把远程与本地差异当确定性结果追查（参数、协议封装、编码、额外栈操作），先本地敲定偏移再上远程验证，不要归因于运气。",
+      "notes": "边界：本地/远程不一致的处理纪律。"
+    }
+  ]
+}

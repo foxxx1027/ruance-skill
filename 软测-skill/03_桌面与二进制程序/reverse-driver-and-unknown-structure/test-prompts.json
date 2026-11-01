@@ -1,0 +1,52 @@
+{
+  "skill": "reverse-driver-and-unknown-structure",
+  "version": "0.1.0",
+  "source_book": "《漏洞战争：软件漏洞分析精要》 林桠泉",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "这个驱动没有源码也没有文档，怎么从 IOCTL 码切入分析？",
+      "expected_behavior": "激活 reverse-driver-and-unknown-structure，先固定入口编号（IOCTL 码/导出函数）再由 Xrefs 收口",
+      "notes": "正面：驱动接口逆向"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "怎么逆一个完全没有文档的内存结构布局？",
+      "expected_behavior": "激活本 skill，用访问模式与偏移推断结构布局",
+      "notes": "正面：未知结构逆向"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "怎么自动追踪驱动的 IOCTL 处理函数？",
+      "expected_behavior": "激活本 skill，给出 IOCTL 分发函数追踪路径",
+      "notes": "正面：IOCTL 分发追踪"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "帮我绕过 ASLR 把利用链写稳",
+      "expected_behavior": "不应激活；属用户态利用链构造",
+      "notes": "诱饵：漏洞话题但目标错位"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "驱动漏洞已经确认是任意写，接下来怎么提权？",
+      "expected_behavior": "不应激活本 skill；应激活 kernel-exploitation（已进入提权阶段）",
+      "notes": "跨 skill 混淆诱饵：与内核提权 skill 抢调用"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "驱动里有一大堆 IOCTL 码，我不知道先看哪一个",
+      "expected_behavior": "边界：可激活本 skill，给出用调用可达性/权限要求/输入可控性排序 IOCTL 的检索序，而非逐个盲试",
+      "notes": "边界：入口过多时的取舍"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "至少 3 条 should_trigger + 2 条 should_not_trigger + 1 条 edge_case。全部 should_not_trigger 必须通过（诱饵容错为 0），且其中至少 1 条是同书兄弟 skill 的场景（跨 skill 混淆测试）。"
+}

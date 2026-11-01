@@ -1,0 +1,73 @@
+{
+  "skill": "self-reliance",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们核心的那颗芯片全靠一家海外供应商，人家一断供我们就得停摆，是不是该自己搞一套？",
+      "expected_behavior": "调用 self-reliance，列关键能力清单、判定立足点是否押在外部、为命脉定自建路径与分阶段里程碑",
+      "notes": "正面场景：关键能力依赖单一外部方、想自研，命中 A2 情境 1 与『被卡脖子』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "公司业务几乎全压在一个平台上，账号一封就完蛋，纠结要不要自建渠道、要不要分散一下。",
+      "expected_behavior": "调用 self-reliance，识别单点依赖、给命脉定自建或分散路径，外部部分定位为辅助并备替代方案",
+      "notes": "正面场景：业务过度依赖单一平台，命中 A2 情境 2 与『离不开这个平台』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "投资方口头说会长期支持我们，这个承诺能当成我们规划的前提吗？",
+      "expected_behavior": "调用 self-reliance，做『丢掉幻想』检查，逐条写出若对方不这么做怎么办，把命脉升为自建",
+      "notes": "正面场景：不确定能否把外部承诺当规划前提，命中 A2 情境 5 与『他们答应了会支持我们』"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "关键的技术能力到底要不要自研，还是继续买别人的更划算？",
+      "expected_behavior": "调用 self-reliance，判定该能力是否命脉：是则自建；非命脉且外购更优则明确列为『可外借』，不强行自建",
+      "notes": "正面场景：关键能力要不要自研，命中 A2 情境 3"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "下周就跟大客户签合同了，万一他们临时反悔怎么办，要不要先留个后手、做个预案？",
+      "expected_behavior": "不应激活 self-reliance，应激活 worst-case-preparation；后者管行动前的风险预案与胜算，本 skill 管方针立足点与关键能力的归属",
+      "notes": "跨 skill 混淆诱饵：都涉及『别全押一个点』，但一个是风险预案、一个是能力归属"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "对手太强了，团队都没信心、畏手畏脚的，怎么才能既敢上又不轻敌？",
+      "expected_behavior": "不应激活 self-reliance，应激活 strategic-contempt-tactical-seriousness；那是『本质—具体』两层心态判断",
+      "notes": "跨 skill 混淆诱饵：竞争场景，但焦点是心态而非自立"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我把这份英文邮件翻译成中文。",
+      "expected_behavior": "纯翻译，不应激活任何方法论 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "既然要靠自己，那我打算把跟外面的所有合作都停掉，技术、渠道全部自己重做一遍。",
+      "expected_behavior": "不应激活 self-reliance 的这类用法；B 段明确警告不能把『自力更生』误读为闭关排外、拒绝一切外部合作——关键能力自建与积极争取外援并行不悖",
+      "notes": "边界：区分『把方针放在自己力量基点上』与『闭关排外、拒绝一切合作』"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "有个非命脉的小工具，外部方案又快又好又便宜，可我偏要自己从头研发一套。",
+      "expected_behavior": "不应激活 self-reliance；B 段指出非命脉、外部明显更优更省时却为『自主』强行自研，属成本不划算的过用",
+      "notes": "边界：区分『命脉能力自建』与『非命脉能力的过度自研』"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 worst-case-preparation 与 strategic-contempt-tactical-seriousness）+ 2 条 edge_case。全部 should_not_trigger 必须通过。"
+}

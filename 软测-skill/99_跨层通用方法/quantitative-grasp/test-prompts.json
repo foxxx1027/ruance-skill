@@ -1,0 +1,73 @@
+{
+  "skill": "quantitative-grasp",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "要出一项新政策，涉及好几万人，可我们连到底多少人受影响、各是什么情况都没数，全靠『大概不少』在拍板。",
+      "expected_behavior": "调用 quantitative-grasp，先明确要量化的关键问题、收集基本数量与结构占比（注明口径），再找出决定质量的数量界限并接入决策",
+      "notes": "正面场景：涉及面广的政策却只凭印象拍板，命中 A2 情境 1 与『大概有多少』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "想给补贴定个门槛，可只有『多、少』的定性感觉，不知道到底定多少合适。",
+      "expected_behavior": "调用 quantitative-grasp，把定性感觉落成可核查的数字/比例与一条明确红线",
+      "notes": "正面场景：设门槛只有定性感觉，命中 A2 情境 2 与『要不要定个比例』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "要给客户分档处理（ABC 三类），可各档大概占多大比例，我完全没底。",
+      "expected_behavior": "调用 quantitative-grasp，先收集总量与占比、注明统计口径，再据以分档并设界",
+      "notes": "正面场景：分档需知道各档比例，命中 A2 情境 3"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "大家都说这个『挺严重』，可到底涉及多少人、占多大比例，谁也说不清，我想弄明白。",
+      "expected_behavior": "调用 quantitative-grasp，把『看着不少』『感觉很多』这类模糊描述转成基本数量分析",
+      "notes": "正面场景：被模糊描述困住想判断严重程度，命中 A2 情境 4"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "这次要处置一批违规的人，我在纠结是不是全都处理、会不会把多数人推到对立面。",
+      "expected_behavior": "不应激活 quantitative-grasp，应激活 narrow-target；后者是用数量上限约束处置范围的专门应用（给处置面设比例纪律），本 skill 是一般性的数量分析",
+      "notes": "跨 skill 混淆诱饵（高混淆对）：都涉及『设上限/比例』，但焦点是处置政策而非数量分析本身"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "手上事情太多、资源不够，我到底该先抓哪个？",
+      "expected_behavior": "不应激活 quantitative-grasp，应激活 principal-contradiction；后者在多矛盾间择一集中力量",
+      "notes": "跨 skill 混淆诱饵（高混淆对）：资源分配场景，但焦点是抓主要矛盾而非量化"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我算一下 47 乘 68 等于多少。",
+      "expected_behavior": "纯计算，不应激活任何方法论 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "这个行业的真实数据根本拿不到，现有来源还明显造假，要不要硬估一个数先把指标定下来？",
+      "expected_behavior": "不应激活 quantitative-grasp 的精确量化路径；B 段指出关键数据不可得或严重失真时，量化会制造『伪精确』，比不量化更危险，应如实标注不确定性、退回定性判断",
+      "notes": "边界：区分『可量化』与『数据不可得/失真应退回定性』"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我在纠结这辈子该过哪种活法更好，想给它算个数对比一下。",
+      "expected_behavior": "不应激活 quantitative-grasp；B 段指出纯价值判断本质上没有可比较的数字",
+      "notes": "边界：区分『可量化的决策』与『纯价值判断』"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，指向高混淆对 narrow-target 与 principal-contradiction）+ 2 条 edge_case。全部 should_not_trigger 必须通过。"
+}

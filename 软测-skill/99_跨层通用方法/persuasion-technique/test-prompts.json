@@ -1,0 +1,73 @@
+{
+  "skill": "persuasion-technique",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我这份方案写了两千多字，讲给老板听他全程一脸茫然，完全是鸡同鸭讲，我该从哪改？",
+      "expected_behavior": "调用 persuasion-technique，先弄清受众（老板关心什么、能听懂什么），据此定内容与用词，再对照清单删改",
+      "notes": "正面场景：写完不会改、对方听不懂，命中 A2 情境 1、2"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "我写的东西又空又啰嗦，全是套话，自己都看不下去，怎么删才能干净有力一点？",
+      "expected_behavior": "调用 persuasion-technique，至少看两遍、删尽可有可无的字句段，用事实和道理替换空话，不生造词",
+      "notes": "正面场景：稿子空话多、啰嗦、自我重复，命中 A2 情境 4 与『太啰嗦/太空了』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我提的建议每次都没人理，会上说完就过去了，怎么讲才能让同事真的买账？",
+      "expected_behavior": "调用 persuasion-technique，先给刺激再给路径，关键主张用事实数据支撑，以理服人不靠强压",
+      "notes": "正面场景：建议总被忽视、要提升说服力，命中 A2 情境 3"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "明天要给一帮完全不懂技术的客户讲我们的产品，怎么讲他们才听得进去、不觉得我在绕圈子？",
+      "expected_behavior": "调用 persuasion-technique，射箭看靶、弹琴看听众，按受众调整内容深浅与用词",
+      "notes": "正面场景：向不懂自己专业的人讲清复杂方案，命中 A2 情境 2"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "一线同事反映了很多问题，方案落地总是不顺，我想把大家分散的意见收集上来，再形成一套办法推下去。",
+      "expected_behavior": "不应激活 persuasion-technique，应激活 mass-line；那是『从群众中来到群众中去』的收集—加工—回检闭环，本 skill 是『说与写』的表达技巧",
+      "notes": "跨 skill 混淆诱饵：都涉及沟通，但一个是倾听征集、一个是表达说服"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "收上来一大堆用户反馈，信息太杂，怎么才能删繁就简、理出真正的洞察？",
+      "expected_behavior": "不应激活 persuasion-technique，应激活 material-refinement；那是感性材料加工四法（去粗取精/去伪存真/由此及彼/由表及里），本 skill 不负责加工材料",
+      "notes": "跨 skill 混淆诱饵：都涉及『删/理内容』，但一个是素材加工、一个是表达遣词"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我查一下『锲而不舍』这个成语出自哪里。",
+      "expected_behavior": "纯信息查询，不应激活任何方法论 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "帮我把这份采购合同改得口语化一点、好懂一点，把那些拗口的条款都删掉。",
+      "expected_behavior": "不应激活 persuasion-technique；按 B 段，法律、技术、合同等需要严谨精确的文本，口语化与过度删减会损害精确性",
+      "notes": "边界：区分『沟通类写作』与『需精确的法律/技术文本』"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "帮我写个能一呼百应、让人热血沸腾的口号，喊起来要有气势、够响。",
+      "expected_behavior": "不激活 persuasion-technique 的删改路径；B 段警告『口号式宣传、空话连篇』正是本 skill 要治的病，应转为摆事实讲道理",
+      "notes": "边界：区分『用事实与道理说服』与『口号式空喊』"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 mass-line 与 material-refinement）+ 2 条 edge_case。全部 should_not_trigger 必须通过。"
+}

@@ -1,0 +1,69 @@
+{
+  "skill": "kernel-driver-fuzzing",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "手上有一个 .sys，想系统挖它的漏洞，但不知道设备名和 IoControlCode 该从哪里拿。",
+      "expected_behavior": "应调用 kernel-driver-fuzzing；第一个动作是静态在 IDA 找 IoCreateDevice、IoCreateSymbolicLink 与 CTL_CODE 常量，动态看设备树或 MITM 日志。",
+      "notes": "正面场景：驱动 IOCTL Fuzz 的对象提取。"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "MITM 跑了一轮，日志里控制码长期只有那几种，怀疑覆盖不全，是不是该换 Driver Fuzz 了？",
+      "expected_behavior": "应调用本 skill；第一个动作是确认 MITM 受目标程序功能限制这一判据，然后用 Driver Fuzz 对已知控制码补齐参数组合。",
+      "notes": "正面场景：MITM 覆盖不足时的模式切换。"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "Driver Fuzz 要不要连输入输出地址一起随机？Method 位到底怎么影响要 Fuzz 的参数面？",
+      "expected_behavior": "应调用本 skill；第一个动作是拆 IoControlCode 最低两位，非 NEITHER 只 Fuzz 数据与长度，NEITHER 才把输入输出地址纳入。",
+      "notes": "正面场景：按 Method 位裁剪参数面，避免组合爆炸。"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "Fuzz 一跑就蓝屏，怎么知道是哪个控制码、哪组参数触发的，现场又该怎么保留？",
+      "expected_behavior": "应调用本 skill；第一个动作是补齐每轮 Fuzz 项与参数的日志并配置内核转储，蓝屏后回滚快照而非重装环境。",
+      "notes": "正面场景：崩溃监控与现场保全。"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "想 fuzz 一个 HTTP 服务的认证流程和会话状态机，该用什么策略和组织语料？",
+      "expected_behavior": "不应调用本 skill；应调用 network-protocol-fuzzing，对象是用户态服务的协议状态。",
+      "notes": "跨 skill 诱饵：网络协议与 Ring3→Ring0 设备控制码不同。"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "崩溃已经拿到了，驱动能往任意地址写，接下来怎么归约成写原语、选提权路线？",
+      "expected_behavior": "不应调用本 skill；应调用 kernel-driver-exploitation，本 skill 只到“崩溃对应哪组参数”。",
+      "notes": "跨 skill 诱饵：Fuzz 产出崩溃，利用阶段另属他 skill。"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "还没决定要不要 fuzz，Blind 和 Smart 两种范式该怎么选，样本和模型哪个更适合我？",
+      "expected_behavior": "不应调用本 skill；应调用 fuzzing-strategy 做跨对象的范式选型。",
+      "notes": "跨 skill 诱饵：通用 Fuzz 选型先于内核 IOCTL 的具体执行。"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "设备名打不开，也抓不到任何真实调用，是不是可以直接硬跑 Driver Fuzz？",
+      "expected_behavior": "应调用本 skill，由其判停条件指出：设备名/控制码缺失时不要硬跑 Driver Fuzz，应退回 MITM 借真实调用链，或转 reverse-driver-and-unknown-structure。",
+      "notes": "边界：Driver Fuzz 的设备名与控制码不能为空。"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "目标驱动跑在开了 HVCI 和 DSE 的 Win11 上，书里那套 Hook NtDeviceIoControlFile 的 MITM 还能照用吗？",
+      "expected_behavior": "应调用本 skill 但明确降级：先评估 PatchGuard/DSE/HVCI 是否允许加载测试驱动与核内 Hook；不成立时说明假设失效，改寻现代内核 Fuzz 环境，不要照搬。",
+      "notes": "边界：时代局限导致 MITM 前提可能不成立。"
+    }
+  ]
+}

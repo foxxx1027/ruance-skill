@@ -1,0 +1,73 @@
+{
+  "skill": "network-deception-and-mitm",
+  "version": "0.1.0",
+  "source_book": "《灰帽黑客 第4版》 — Daniel Regalado 等",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "内网怎么做 ARP 欺骗把流量引到我的机器？",
+      "expected_behavior": "应激活本 skill，说明 ARP 欺骗、转发与范围/授权前提",
+      "notes": "正面：ARP 欺骗"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "LLMNR/NBT-NS 投毒怎么配置，才能抓到凭据哈希？",
+      "expected_behavior": "应激活本 skill，给出投毒与 Responder 类工具的配置顺序",
+      "notes": "正面：名称解析投毒"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "Cisco 设备上怎么做 VLAN 跳跃和 CDP 欺骗？",
+      "expected_behavior": "应激活本 skill，按交换网络攻击链执行并说明影响",
+      "notes": "正面：Cisco 攻击"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "这个网站有 XSS，怎么用 BeEF 控制浏览器？",
+      "expected_behavior": "不应激活本 skill，应激活同书 beef-client-side-attack",
+      "notes": "跨 skill 混淆诱饵（硬性要求）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "授权还没签，能不能先做 ARP 欺骗验证一下？",
+      "expected_behavior": "不应激活本 skill 执行，应先激活同书 pentest-engagement-and-disclosure",
+      "notes": "诱饵：授权未定"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我配置一个正常的 DNS 服务器",
+      "expected_behavior": "不应激活本 skill，这是正常运维配置",
+      "notes": "诱饵：运维"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "交换网络里 ARP 欺骗被 DAI 拦了怎么办？",
+      "expected_behavior": "应激活本 skill，评估 DAI 配置缝隙与其他投毒路径，而不是硬发 ARP",
+      "notes": "边界：防护设备在场"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "无线网络下的 MITM 和有线有什么不同？",
+      "expected_behavior": "可轻量说明无线层差异；若本书未覆盖具体无线攻击，应明确边界并转无线专项 skill",
+      "notes": "边界：本书覆盖范围"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "抓到 NTLM hash 后怎么离线破解？",
+      "expected_behavior": "不应激活本 skill，凭据破解属于另一环节",
+      "notes": "边界：凭据捕获 vs 破解"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含至少 1 条同书兄弟 skill 混淆诱饵）+ 3 条 edge_case；全部 should_not_trigger 必须通过。"
+}

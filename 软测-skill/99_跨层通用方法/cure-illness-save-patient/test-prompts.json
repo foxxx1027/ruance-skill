@@ -1,0 +1,59 @@
+{
+  "skill": "cure-illness-save-patient",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们组一个骨干把一个重要项目搞砸了，损失不小，我想狠狠批评他一顿，又怕把人批跑了，该怎么办？",
+      "expected_behavior": "调用 cure-illness-save-patient，按团结—批评—团结流程：先定改进目的，再讲清是非、对事不对人地批评，最后给出改进路径与帮助",
+      "notes": "正面场景：内部骨干犯错、批评尺度纠结，命中 A2 情境 1、3"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "团队里两个人吵得不可开交，底下分了两派互相使绊子，我想把对错讲清楚，又不想把队伍搞散。",
+      "expected_behavior": "调用 cure-illness-save-patient，以『达到新的团结』为终点，分清是非、分析原因、帮助双方回到协作，避免人人自危",
+      "notes": "正面场景：内部冲突分裂，命中 A2 情境 2 与语言信号『团队内部吵架/分裂』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "下周要跟一个有过失的下属做绩效面谈，他确实出过问题但能力很强我还想留，怎么谈才能既讲清问题又不把关系搞僵？",
+      "expected_behavior": "调用 cure-illness-save-patient，示范对事不对人、一看二帮的面谈流程，并以行为效果而非表态检验是否真改",
+      "notes": "正面场景：追责式面谈但想留人，命中 A2 情境 3、4"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "合作方一而再再而三越界占我们便宜，我一直忍让，现在纠结是继续让还是干脆跟他们翻脸。",
+      "expected_behavior": "不应激活 cure-illness-save-patient，应激活 unity-through-struggle（既联合又斗争、以斗争求团结）；本 skill 处理的是内部自己人犯错，此处对象是外部长期合作方，二者为 contrasts-with 关系",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：都涉及『要不要批评/翻脸』，但本 skill 前提是内部、想留关系；外部盟友越界属 unity-through-struggle"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "公司要整顿一批违规的人，我担心一律开掉会把大多数原本可争取的人推到对立面，该怎么把握处理范围？",
+      "expected_behavior": "不应激活 cure-illness-save-patient，应激活 narrow-target（缩小打击面、区别对待）；本 skill 讲对当事人本人如何斗与帮，此处焦点是处置一批对象的比例约束",
+      "notes": "跨 skill 混淆诱饵：都涉及『处理犯错的人』，但此处核心是『打击面比例』，属 narrow-target；两 skill 为 composes-with 但职责不同"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我看下这段 Python 报错是什么原因，IndexError 一直修不掉。",
+      "expected_behavior": "纯编程排错，不应激活任何人际/团队类 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "有个员工长期消极怠工，我找他谈了好几回也不改，还在背后带节奏影响别人，我该继续耐心帮他，还是直接走问责？",
+      "expected_behavior": "先按 cure-illness-save-patient 走一看二帮，但触及 E 段判停条件——当事人拒绝一切改进且持续损害团队——应转为明确边界与问责，不再适用治病救人式的无限耐心",
+      "notes": "边界：本 skill 有判停点，区分『可教育可转化』与『持续损害团队』"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 unity-through-struggle 与 narrow-target）+ 1 条 edge_case。全部 should_not_trigger 必须通过。"
+}

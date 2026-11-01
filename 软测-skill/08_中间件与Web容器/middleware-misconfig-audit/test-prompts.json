@@ -1,0 +1,73 @@
+{
+  "skill": "middleware-misconfig-audit",
+  "version": "0.1.0",
+  "source_book": "《Web中间件常见漏洞总结》 — lyxhh",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "帮我审一下这段 Nginx 配置，location /files 配了 alias，会不会目录穿越？",
+      "expected_behavior": "应激活本 skill，比对 location 与 alias 的尾斜杠是否一致，并给出验证请求",
+      "notes": "正面：alias 斜杠穿越"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "全站都配了 CSP，为什么 /test2 这个路径还是能弹 XSS？",
+      "expected_behavior": "应激活本 skill，检查子块是否定义了 add_header 导致父块安全头全部不继承",
+      "notes": "正面：add_header 覆盖"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "Tomcat 的 readonly 默认是什么值？什么情况下能用 PUT 写文件？",
+      "expected_behavior": "应激活本 skill，说明 readonly 默认 true，仅当被显式改为 false 时 DefaultServlet 才允许 PUT",
+      "notes": "正面：默认开关审计"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "上传的 jpg 文件里带了 PHP 代码，访问时会不会被执行？",
+      "expected_behavior": "不应激活本 skill，应激活同书 upload-parser-bypass-audit",
+      "notes": "跨 skill 混淆诱饵（同书兄弟 skill）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "WebLogic 的 wls-wsat 除了 CoordinatorPortType 还有哪些 URI 可以打？",
+      "expected_behavior": "不应激活本 skill，应激活同书 java-deserialization-entry-enumeration",
+      "notes": "跨 skill 混淆诱饵（同书兄弟 skill）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我写一个 Nginx 反向代理配置，把 /api 转发到 8080",
+      "expected_behavior": "不应激活本 skill，这是普通配置编写，不是安全审计",
+      "notes": "诱饵：配置开发任务"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "配置文件在 Git 里看着没问题，线上行为却不对，怎么查？",
+      "expected_behavior": "应激活本 skill，提示存在配置漂移/包含文件/子块覆盖，需以线上实际生效配置与行为为准",
+      "notes": "边界：配置漂移"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "目标前面有 CDN，边缘返回的安全头和源站不一致，以哪个为准？",
+      "expected_behavior": "应激活本 skill，说明要区分边缘与源站实际生效层，安全结论以最终到达浏览器的响应为准并分别验证",
+      "notes": "边界：CDN 分层"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "只拿到黑盒目标，没有配置文件，还能做配置型漏洞审计吗？",
+      "expected_behavior": "应激活本 skill，但要限定为行为验证（autoindex、方法允许、响应头拆分），无法确认的项标注为假设",
+      "notes": "边界：无配置访问权"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含 2 条同书兄弟 skill 混淆诱饵）+ 3 条 edge_case；全部 should_not_trigger 必须通过。"
+}

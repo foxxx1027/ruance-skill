@@ -1,0 +1,73 @@
+{
+  "skill": "typical-survey-verification",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们有三千多家门店，做全量普查太贵了，就挑几家典型的看看行不行？",
+      "expected_behavior": "调用 typical-survey-verification，按最坏/中等/最好（或分层）各选一两个、给选点理由，点数不求全",
+      "notes": "正面场景：全量普查还是挑典型，命中 A2 情境 1 与『要不要普查』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "只访谈了七八个用户，就想拿这个推断整个市场，样本到底够不够、有没有代表性？",
+      "expected_behavior": "调用 typical-survey-verification，检验样本代表性、必要时增加分层，不要用一个典型硬推整体",
+      "notes": "正面场景：少量样本推断整体，命中 A2 情境 2 与『样本有代表性吗』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "经销商给我的一份数据，我总觉得他在报喜不报忧，这个数据可不可信、怎么核实？",
+      "expected_behavior": "调用 typical-survey-verification，对调查本身做二次检验（三不信），用勾推法先查周围环境与相关人再核对当事人",
+      "notes": "正面场景：怀疑信息不可靠需核对，命中 A2 情境 3 与『这个数据可信吗』"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "下去摸排情况，该挑哪几个点？是走马观花快速看看，还是得蹲下去细看？",
+      "expected_behavior": "调用 typical-survey-verification，面上走马看花、关键点下马看花亲自深入蹲点，并说明选点理由",
+      "notes": "正面场景：定典型摸排方案、选点与取材料方式，命中 A2 情境 4"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "情况还没摸清，老板就催着拍板，我是不是该先下去调研、开个调查会再定？",
+      "expected_behavior": "不应激活 typical-survey-verification，应激活 investigation-method；那是调查总纲（要不要调、怎么开讨论式调查会），本 skill 只解决『挑哪些典型』与『如何二次核对』",
+      "notes": "跨 skill 混淆诱饵（硬性要求，任务点名）：都沾『调研』字面，但此处焦点是『要不要调、怎么调』"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "一大堆访谈记录收上来了，信息太杂，怎么加工成真正的洞察？",
+      "expected_behavior": "不应激活 typical-survey-verification，应激活 material-refinement；那是材料到手后的加工工序（去粗取精等）",
+      "notes": "跨 skill 混淆诱饵：都涉及调查所得，但此处焦点是加工而非选点/核对"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我看看这个 PDF 怎么转成 Word。",
+      "expected_behavior": "纯工具操作，不应激活任何方法论 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我需要知道全市各年龄段人口各占多少，误差不能超过 1%，能不能靠解剖一两个典型搞定？",
+      "expected_behavior": "不应激活 typical-survey-verification；B 段指出需要总体精确统计或比例时应做普查或规范抽样，解剖一两个典型会系统性失真",
+      "notes": "边界：区分『以点带面的定性摸底』与『需要精确比例的总体统计』"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "手头这几十家情况差别特别大，能不能就挑一两家代表全体？",
+      "expected_behavior": "不应激活 typical-survey-verification；B 段指出对象高度异质时，『典型要少（一两个）』的前提不成立",
+      "notes": "边界：区分『同质对象可典型化』与『高度异质对象无法用单个典型代表』"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，其中 1 条按任务点名指向 investigation-method，另 1 条指向 material-refinement）+ 2 条 edge_case。全部 should_not_trigger 必须通过。"
+}

@@ -1,0 +1,52 @@
+{
+  "skill": "logic-and-isolation-bugs",
+  "version": "0.1.0",
+  "source_book": "《漏洞战争：软件漏洞分析精要》 林桠泉",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "这个 TOCTOU 漏洞的 PoC 需要极高的并发运气，怎么提高成功率？",
+      "expected_behavior": "激活 logic-and-isolation-bugs，用 Check/Use 时间窗模型给出'主动撑开窗口'（加锁/占用/OpLock 回调）而非提高并发数",
+      "notes": "正面：竞态成功率"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "一个脚本引擎允许把数组当字典用，这算类型混淆吗？",
+      "expected_behavior": "激活本 skill，用'布局错配'判据裁决（解析类型与实际布局是否不符）",
+      "notes": "正面：类型混淆判定"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "面对一个我没研究过的浏览器沙盒，该从哪几处下手？",
+      "expected_behavior": "激活本 skill，用 6 类攻击面清单逐项试探",
+      "notes": "正面：沙盒逃逸攻击面"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "堆溢出漏洞怎么构造利用",
+      "expected_behavior": "不应激活；属内存破坏类漏洞利用",
+      "notes": "诱饵：漏洞话题但类别不符"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "这个洞到底算程序缺陷还是策略缺陷？",
+      "expected_behavior": "不应激活本 skill；应激活 vuln-essence-classification（顶层二元归类）",
+      "notes": "跨 skill 混淆诱饵：与二元分类 skill 抢调用"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "程序在多线程下偶尔出错，这算竞争条件漏洞吗？",
+      "expected_behavior": "边界：可激活本 skill，但需按判据区分'普通多线程 bug'与'检查—使用存在可被利用窗口且影响安全边界'的竞争漏洞",
+      "notes": "边界：多线程 bug vs 竞态漏洞"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "至少 3 条 should_trigger + 2 条 should_not_trigger + 1 条 edge_case。全部 should_not_trigger 必须通过（诱饵容错为 0），且其中至少 1 条是同书兄弟 skill 的场景（跨 skill 混淆测试）。"
+}

@@ -1,0 +1,73 @@
+{
+  "skill": "worst-case-preparation",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "公司现金只够撑四个月了，要不要分点资源去做一个资金断裂的预案？",
+      "expected_behavior": "调用 worst-case-preparation，列关键不确定性、为每个最坏情况配应对手、检验准备是否充分、分散关键资源",
+      "notes": "正面场景：要不要做最坏打算，命中 A2 情境 1 与『要不要做个最坏的打算』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "下周就签大合同了，万一对方临时反悔怎么办，要不要先留一手？",
+      "expected_behavior": "调用 worst-case-preparation，为『谈崩/反悔』配应对手，明确若最坏情况明天发生是否有准备有把握",
+      "notes": "正面场景：重要合作可能反悔要不要备一手，命中 A2 情境 2 与『万一他反悔了怎么办』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我们的核心业务全押在一个大客户身上，该不该做个备份、留条退路？",
+      "expected_behavior": "调用 worst-case-preparation，分散关键资源、备多头备份或分批投入",
+      "notes": "正面场景：关键资源依赖单点是否要备份，命中 A2 情境 3 与『留一手』"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "这个项目是现在冲进去，还是再等等、准备充分有把握了再动？",
+      "expected_behavior": "调用 worst-case-preparation，检验『准备是否充分、把握是否在手』，答否则补准备或暂缓发起",
+      "notes": "正面场景：现在动还是再等等、有无把握，命中 A2 情境 5 与『现在打有没有把握』"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "这事要不要 all in 赌一把大的、一次定输赢？",
+      "expected_behavior": "不应激活 worst-case-preparation，应激活 favorable-decisive-battle；后者管『要不要发起决战式行动』，本 skill 管行动前的两手准备",
+      "notes": "跨 skill 混淆诱饵：都涉及风险与出手，但焦点是决战取舍"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我们的命脉全押在一家供应商身上，纠结关键能力要不要自己建一套。",
+      "expected_behavior": "不应激活 worst-case-preparation，应激活 self-reliance；后者管方针立足点与关键能力的归属",
+      "notes": "跨 skill 混淆诱饵：都涉及『别全押一个点』，但一个是能力归属、一个是风险预案"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "对手远强于我们，团队都没信心、畏手畏脚，怎么才能既敢上又不轻敌？",
+      "expected_behavior": "不应激活 worst-case-preparation，应激活 strategic-contempt-tactical-seriousness；那是『本质—具体』两层心态判断",
+      "notes": "跨 skill 混淆诱饵：都涉及面对强对手，但焦点是心态双层而非风险预案"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我在纠结周末去哪家餐厅吃饭，要不要先做个最坏情况的预案？",
+      "expected_behavior": "不应激活 worst-case-preparation；B 段指出后果可逆、损失可承受的日常小决策，套用会变成拖延与过度谨慎",
+      "notes": "边界：区分『不可逆的重大风险』与『可逆低损失的日常小决策』"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我怕合作方反悔，干脆先默认他一定会背叛、提前跟他翻脸，留足后手。",
+      "expected_behavior": "不应激活 worst-case-preparation 的这类用法；B 段指出最坏准备的正确对象是『客观风险』而非『给对方定罪』，预设伙伴背叛会自我实现、破坏信任",
+      "notes": "边界：区分『为客观风险做准备』与『预设伙伴一定背叛』"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条 should_trigger + 3 条 should_not_trigger（全为跨 skill 混淆诱饵，分别指向 favorable-decisive-battle、self-reliance、strategic-contempt-tactical-seriousness）+ 2 条 edge_case。全部 should_not_trigger 必须通过。"
+}

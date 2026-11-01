@@ -1,0 +1,66 @@
+{
+  "skill": "lean-organization",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "公司两年从五十人扩到三百人，现在人浮于事，各部门还在互相抢人要编制，我该怎么判断哪里该瘦身、砍哪里？",
+      "expected_behavior": "调用 lean-organization，先诊断『鱼大水小』找出机构大于任务的环节，再厘清核心任务与环境，设计精简方案并按精简/统一/效能/节约/反官僚五项验收",
+      "notes": "正面场景：扩张后臃肿、判断瘦身标准，命中 A2 情境 1 与语言信号『组织太臃肿了，怎么瘦身』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "老板让我出一份降本增效方案，我不确定到底该单纯按人数砍，还是得重构一下机构？",
+      "expected_behavior": "调用 lean-organization，纠偏『按人数硬砍』，把判据拉回机构与任务的匹配，保护与任务匹配的关键能力",
+      "notes": "正面场景：降本增效、砍人还是重构，命中 A2 情境 5 与语言信号『降本增效怎么做才不伤业务』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "现在审批层级越来越多，一件事要过五六道手，感觉机构比要干的事还大，怎么办？",
+      "expected_behavior": "调用 lean-organization，按机构—任务匹配识别冗余层级与流程，做合并/撤销/下移，并用五项验收确认未伤及效能",
+      "notes": "正面场景：层级/流程膨胀、机构大于任务，命中 A2 情境 3 与语言信号『机构比事情还大』"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我们团队开会总是讨论半天定不下来，我一不在就停摆，怎么把班子真正带起来？",
+      "expected_behavior": "不应激活 lean-organization，应激活 committee-work-methods（团队/委员会的工作方法）；本 skill 专讲机构与任务的匹配，不负责会议与领导方法",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：committee-work-methods 的清单里含『精兵简政』一款，故最易抢调用；但纯问带队与会议应激活 committee-work-methods（二者 composes-with）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我想给这次资源分配定个明确的数字界限，不要再用『差不多』含糊过去，这个比例该怎么算？",
+      "expected_behavior": "不应激活 lean-organization，应激活 quantitative-grasp（胸中有数/数量分析找出质量界限）；本 skill 是把量化要求落到『机构该多大』，此处是通用数量分析",
+      "notes": "跨 skill 混淆诱饵：都涉及『定数字』，但此处是数量分析通用方法，属 quantitative-grasp（本 skill 的 depends-on）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我订一间下周三下午能坐二十人的会议室。",
+      "expected_behavior": "纯事务性操作，不应激活任何组织类 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "董事会为了让财报好看，直接要求我砍掉百分之三十的人，这个我就照做吗？",
+      "expected_behavior": "不应简单照做也不应按人数硬砍；调用 lean-organization 后须先做『鱼大水小』诊断——判据是机构是否与任务匹配，而非财报或人数；若只是为指标砍人则属 B 段明确排除的滥用",
+      "notes": "边界：区分『机构—任务匹配』与『为财报/指标砍人数』，后者是 B 段警告的误用"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我们业务正在快速扩张、订单翻倍，这时候是不是也该跟着做组织瘦身？",
+      "expected_behavior": "不应激活机械瘦身；按 B 段，任务正快速扩张期机构可能需要同步扩充，机械『瘦身』反而与任务脱节",
+      "notes": "边界：瘦身以『机构大于任务』为前提，任务扩张期不适用"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 committee-work-methods 与 quantitative-grasp）+ 2 条 edge_case。全部 should_not_trigger 必须通过。"
+}

@@ -1,0 +1,73 @@
+{
+  "skill": "java-deserialization-entry-enumeration",
+  "version": "0.1.0",
+  "source_book": "《Web中间件常见漏洞总结》 — lyxhh",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "JBoss 的 /invoker/readonly 返回 500，能确认存在反序列化漏洞吗？",
+      "expected_behavior": "应激活本 skill，说明 500 只是页面存在的判据，需枚举其他 invoker 入口并用可观测解析证据验证",
+      "notes": "正面：JBoss 入口判定"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "WebLogic 已经打了 CVE-2017-10271 的补丁，还有没有别的入口或绕过方式？",
+      "expected_behavior": "应激活本 skill，读取 wls-wsat/_async 的 URI 全集，并把补丁当黑名单找未被过滤的等价标签",
+      "notes": "正面：补丁黑名单判读"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我有一份 CommonsCollections 的 ser，应该往哪个接口发？",
+      "expected_behavior": "应激活本 skill，先确认产品/版本与可用入口，再判断 gadget 依赖与平台是否匹配",
+      "notes": "正面：已有 gadget 找入口"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "上传的 .asp;.jpg 为什么会被 IIS 当成 asp 执行？",
+      "expected_behavior": "不应激活本 skill，应激活同书 upload-parser-bypass-audit",
+      "notes": "跨 skill 混淆诱饵（同书兄弟 skill）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "Nginx 的 alias 少写一个斜杠，怎么构造目录穿越请求？",
+      "expected_behavior": "不应激活本 skill，应激活同书 middleware-misconfig-audit",
+      "notes": "跨 skill 混淆诱饵（同书兄弟 skill）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我用 Java 写一个对象序列化和反序列化的 demo，存到文件里",
+      "expected_behavior": "不应激活本 skill，这是普通 Java 开发",
+      "notes": "诱饵：开发任务"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "目标 JDK 版本很高，ysoserial 的链都失败了，是不是没有反序列化漏洞？",
+      "expected_behavior": "应激活本 skill，说明可能是 gadget 与版本/依赖不匹配或受 JEP 290 过滤，不能据此否定入口存在",
+      "notes": "边界：gadget 不适配"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "按建议删掉 wls-wsat.war 之后业务报错，怎么办？",
+      "expected_behavior": "应激活本 skill 识别为修复副作用，回退并改用访问控制/补丁，同时评估组件是否真被使用",
+      "notes": "边界：删组件副作用"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "目标不出网，反弹 shell 回不来，怎么证明反序列化真的执行了命令？",
+      "expected_behavior": "应激活本 skill，改用回显构造或 DNS/HTTP 外带等可观测证据，不把反弹失败等同于漏洞不存在",
+      "notes": "边界：无外连验证"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含 2 条同书兄弟 skill 混淆诱饵）+ 3 条 edge_case；全部 should_not_trigger 必须通过。"
+}

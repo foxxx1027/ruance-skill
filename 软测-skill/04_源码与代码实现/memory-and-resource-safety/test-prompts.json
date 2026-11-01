@@ -1,0 +1,59 @@
+{
+  "skill": "memory-and-resource-safety",
+  "version": "0.1.0",
+  "source_book": "信息安全技术 应用软件安全编程指南（GB/T 38674-2020） — 国家市场监督管理总局、国家标准化管理委员会",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "Java 服务跑一天后句柄数一直涨，重启就恢复，是不是哪里没 close？",
+      "expected_behavior": "应激活 memory-and-resource-safety，并按退出路径核对正常、异常与提前返回三条路径上是否各归还一次。",
+      "notes": "正面场景：句柄泄漏，考「GC 会兜底」这一误解（ce13）。"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "上传的 zip 只有几 KB，解压后把磁盘写满了，怎么加限制？",
+      "expected_behavior": "应激活 memory-and-resource-safety，并按实际写出字节累计设总量、条目数与耗时上限，不采信条目自报大小。",
+      "notes": "正面场景：解压炸弹与容量上限（ce08）。"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "C 里这段 memcpy 的长度是从请求头里读的，会不会写越界？",
+      "expected_behavior": "应激活 memory-and-resource-safety，并核算目标缓冲区容量与本次长度，长度不得直接取自外部输入。",
+      "notes": "正面场景：缓冲区边界与外部可控长度（7.2 b)）。"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "We run on the JVM with GC, but file handles still pile up under load. Do we need explicit close?",
+      "expected_behavior": "应激活 memory-and-resource-safety，并指出 GC 不负责外部句柄，需在每条退出路径显式关闭或使用自动关闭语法。",
+      "notes": "正面场景（英文）：测试双语触发，覆盖「有 GC 就不用管释放」。"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "两个线程同时给同一个计数器加一，压测下来少了好几百，加个锁能解决吗？",
+      "expected_behavior": "不应激活本 skill，应激活 concurrency-safety——问的是共享可变状态的互斥与可见性，不是资源的申请与归还。",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：都会表现为「数量不对/资源紧张」，但根因在并发。"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我们准备把 JVM 堆从 4G 调到 8G，GC 参数怎么配比较稳？",
+      "expected_behavior": "不应激活本 skill：这是容量规划与 GC 调优，属于性能工程，不涉及越界、泄漏与配对释放。",
+      "notes": "诱饵：内存话题，但诉求是运行参数调优，本 skill 明确排除。"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "Go 里我在循环体里写了 defer file.Close()，应该就不会漏句柄了吧？",
+      "expected_behavior": "应激活 memory-and-resource-safety：defer 在函数返回时才执行，循环内会堆积，应改为循环内显式关闭并检查 Close 的返回值。",
+      "notes": "边界：写法看起来符合「配对释放」，实际时机错误，考察是否只看有没有写 close。"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "覆盖 4 条正面场景（含 1 条英文，涵盖句柄泄漏、解压炸弹、缓冲区越界、GC 误解）、2 条诱饵（1 条为兄弟 skill concurrency-safety 的竞态混淆，1 条为 JVM/GC 调优）与 1 条 defer 释放时机边界。should_not_trigger 容错为 0。"
+}

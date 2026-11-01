@@ -1,0 +1,73 @@
+{
+  "skill": "directed-memory-kernel-fuzzing",
+  "version": "0.1.0",
+  "source_book": "《逆向与漏洞分析》 魏强、武泽慧",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "dmkf-01",
+      "type": "should_trigger",
+      "prompt": "我只有一个补丁点地址，想让 fuzz 重点打到那个函数附近，现在 AFL 满世界乱跑，资源都浪费了。",
+      "expected_behavior": "应激活 directed-memory-kernel-fuzzing，并把补丁点或目标函数写成可判定对象，用 CFG/调用图距离给种子排序，先校准目标命中再正式运行。",
+      "notes": "典型触发：有输入但只关心特定位置，属于定向 fuzz；防止误判为普通覆盖率引导。"
+    },
+    {
+      "id": "dmkf-02",
+      "type": "should_trigger",
+      "prompt": "驱动只暴露了一个 ioctl 和设备名，普通文件 fuzz 根本没有输入，这种情况该怎么对内核做模糊测试？",
+      "expected_behavior": "应激活 directed-memory-kernel-fuzzing，判定输入通道是 ioctl/系统调用，选择内核 fuzz 路线，建立含设备名、控制码、参数类型与调用顺序的模板，并准备虚拟机或快照与覆盖反馈。",
+      "notes": "典型触发：无文件输入、只有驱动接口；只做路线判断与输入建模，不展开具体驱动操作。"
+    },
+    {
+      "id": "dmkf-03",
+      "type": "should_trigger",
+      "prompt": "AFL 跑了两天 coverage plateau，no new edges，崩溃也像被吞了，怀疑有 anti-fuzzing，下一步该换哪条路线？",
+      "expected_behavior": "应激活 directed-memory-kernel-fuzzing，先诊断闭环断点，检查执行速度、覆盖率统计与异常捕获三个前提，再换观测通道或改走反 Fuzz 对抗路线，而不是继续加大变异量。",
+      "notes": "含英文 trigger（coverage plateau / anti-fuzzing），验证中英混合信号也能命中。"
+    },
+    {
+      "id": "dmkf-04",
+      "type": "should_trigger",
+      "prompt": "程序闭源，启动后只从内存里接收解密后的数据，磁盘上根本没有能喂进去的样本，之前那套随机变异完全没有进展。",
+      "expected_behavior": "应激活 directed-memory-kernel-fuzzing，判定外部输入通道不可达，改走内存 fuzz：逆向定位解析例程起止，在参数被内部函数使用前变异并做快照恢复。",
+      "notes": "不含术语但情境相同：闭源、无文件输入、解析前开销大；防止只认关键词。"
+    },
+    {
+      "id": "dmkf-05",
+      "type": "should_not_trigger",
+      "prompt": "有个开源的图片解析库，能正常读文件，我想用 AFL 跑几天看看有没有堆溢出，种子和字典该怎么准备？",
+      "expected_behavior": "不应激活 directed-memory-kernel-fuzzing，应激活 coverage-guided-fuzzing，因为有正常文件输入且覆盖率闭环可跑，应先配置种子、字典、边覆盖与停止条件。",
+      "notes": "跨 skill 诱饵：普通文件解析器用 AFL，属于常规覆盖率引导，不该切定向/内存/内核路线。"
+    },
+    {
+      "id": "dmkf-06",
+      "type": "should_not_trigger",
+      "prompt": "已经确认是某个 .sys 驱动，设备名和控制码都拿到了，想按 IOCTL 的 Method 位裁剪参数并搭 MITM fuzz，具体怎么配？",
+      "expected_behavior": "不应激活 directed-memory-kernel-fuzzing，应激活 kernel-driver-fuzzing，因为已确定驱动、设备名与控制码，问题落在 IOCTL 的具体 Fuzz 操作而非是否切换内核路线。",
+      "notes": "跨 skill 诱饵：内核驱动 IOCTL 的具体操作属于 kernel-driver-fuzzing；本 skill 只负责路线取舍与输入建模。"
+    },
+    {
+      "id": "dmkf-07",
+      "type": "should_not_trigger",
+      "prompt": "我们想给自家客户端加一层反 Fuzz 保护，让自动化工具变慢、覆盖率统计失真，有哪些常见实现思路？",
+      "expected_behavior": "不应激活 directed-memory-kernel-fuzzing，应激活 none，因为这是设计反 Fuzz 防护，不是测试目标时诊断闭环失效并切换路线。",
+      "notes": "反 Fuzz 边界诱饵：防的是把“反 Fuzz 防护设计”误判为“反 Fuzz 对抗”。"
+    },
+    {
+      "id": "dmkf-08",
+      "type": "edge_case",
+      "prompt": "我们有个能正常读文件的解析器，但某个深层校验后的函数 AFL 始终进不去，能不能只针对那个函数做定向 fuzz？",
+      "expected_behavior": "应激活 directed-memory-kernel-fuzzing，但需限定：把该函数写成可判定目标并评估静态分析质量；若目标位置写不清或不可靠，应退回 coverage-guided-fuzzing。",
+      "notes": "边界上应调用：有正常输入但只关心特定位置，处于覆盖率引导与定向 fuzz 的交界。"
+    },
+    {
+      "id": "dmkf-09",
+      "type": "edge_case",
+      "prompt": "目标没有文件输入，但我没有权限加载驱动、也跑不了虚拟机，只能在本机用户态随便跑跑，这种情况还能上内核 fuzz 吗？",
+      "expected_behavior": "不应激活 directed-memory-kernel-fuzzing，应激活 none，因为没有内核测试权限与环境，内核路线不可执行，也不能用用户态 fuzz 冒充；应报告通道与权限阻断。",
+      "notes": "边界上不应调用：权限和环境不满足是硬边界，防止把“测不到”当成“已覆盖”。"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "共 9 条：4 条应触发（2 典型、1 英文 trigger、1 无术语同情境）、3 条不应触发（2 条跨 skill 诱饵 + 1 条反 Fuzz 防护设计诱饵）、2 条边界。重点防 coverage-guided-fuzzing、kernel-driver-fuzzing 与本 skill 的路线切换混淆；反 Fuzz 对抗属于本 skill，但反 Fuzz 防护设计不属于。"
+}

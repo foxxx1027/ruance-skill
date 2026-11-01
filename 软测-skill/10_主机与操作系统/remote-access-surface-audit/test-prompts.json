@@ -1,0 +1,76 @@
+{
+  "skill": "remote-access-surface-audit",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "IT 给每台电脑都装了远程控制软件，说是方便支持，这安全吗？",
+      "expected_behavior": "调用本 skill，按服务—通道—凭据三要素审计，而不是按工具品牌判断",
+      "notes": "正面场景：合法管理工具"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "远程桌面改成 3399 端口、密码设到 20 位，是不是就够了？",
+      "expected_behavior": "调用本 skill，指出改端口只是通道伪装，按关服务 → 限通道 → 强认证收敛",
+      "notes": "正面场景：改端口与强密码的误区"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "服务器上有个 7314 端口在监听，浏览器还能打开一个管理页面，这是什么？",
+      "expected_behavior": "调用本 skill，识别为第三方远控或浏览器管理入口，核查服务、通道、凭据与会话",
+      "notes": "正面场景：陌生监听端口"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "怎么审计公司里所有远程入口，包括远程注册表、远程协助和第三方远控？",
+      "expected_behavior": "调用本 skill，给出入口清单、可达性矩阵、凭据与会话核查的执行顺序",
+      "notes": "正面场景：远程入口盘点"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "刚装好的 Windows 默认账户和密码策略要怎么改？",
+      "expected_behavior": "不应调用本 skill，应调用 host-default-surface-convergence 收敛本地默认值",
+      "notes": "同书兄弟诱饵：主机默认攻击面"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "RDP 的 BlueKeep 漏洞影响哪些版本，怎么打补丁？",
+      "expected_behavior": "不应调用本 skill，这是协议漏洞与补丁管理问题",
+      "notes": "诱饵：RDP 漏洞利用/补丁"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我写一条命令，把本机所有管理员密码批量改成一样的。",
+      "expected_behavior": "不应调用本 skill，这是操作请求，且批量共用口令本身是风险",
+      "notes": "诱饵：纯操作"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "远程桌面必须保留给财务用，不能关，那该怎么办？",
+      "expected_behavior": "调用本 skill，转向限制来源、网络级认证、会话审计与例外记录，而不是坚持关服务",
+      "notes": "边界：业务必须保留的入口"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "只有一台完全离线的工控机，需要做远程入口审计吗？",
+      "expected_behavior": "不调用完整审计流程；离线且无远程管理需求时直接确认入口关闭即可",
+      "notes": "边界：离线设备"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "云上开了跳板机，用零信任代理访问内网，原来那套关服务的建议还适用吗？",
+      "expected_behavior": "调用本 skill，但需按云中继与零信任环境重新评估通道层和凭据层",
+      "notes": "边界：现代远程架构"
+    }
+  ]
+}

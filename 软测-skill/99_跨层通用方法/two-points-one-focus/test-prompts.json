@@ -1,0 +1,73 @@
+{
+  "skill": "two-points-one-focus",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "评价我们一个老员工，业务能力很强，但脾气差、还当众顶撞领导，是不是就该一票否决、直接开掉？",
+      "expected_behavior": "调用 two-points-one-focus，列出功过两面、判定主流支流并给出依据，结论既非全盘肯定也非全盘否定",
+      "notes": "正面场景：评价有功也有过的人，命中 A2 情境 1 与『他是好人还是坏人』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "这个新政策有利有弊，我到底该全面肯定还是全盘否定？",
+      "expected_behavior": "调用 two-points-one-focus，两面兼顾后再分主次，不作非黑即白的结论",
+      "notes": "正面场景：有利有弊的决策该怎么算，命中 A2 情境 2"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "团队里有人主张激进、有人主张保守，两边吵得厉害，我怎么才能别倒向任何一边？",
+      "expected_behavior": "调用 two-points-one-focus，对称纠偏——反一种偏向时同时防相反的偏向，不从一个极端荡到另一个",
+      "notes": "正面场景：两种相反偏向需要对称纠偏，命中 A2 情境 3"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "一个合作方只在某个小细节上跟我们不一致，是不是就得终止整个合作？",
+      "expected_behavior": "调用 two-points-one-focus，求大同存小异，不因枝节差异否定大同",
+      "notes": "正面场景：因枝节性分歧要否定整段关系，命中 A2 情境 4"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "手上项目太多、资源只够做一个，我到底该先做哪个？",
+      "expected_behavior": "不应激活 two-points-one-focus，应激活 principal-contradiction；后者是在多个矛盾之间择一聚焦，本 skill 是就同一对象兼顾两面再分主次",
+      "notes": "跨 skill 混淆诱饵（高混淆对）：都涉及『主次/重点』，但对象是多个任务而非同一对象的两面"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "手下一个人最近老出错、状态很差，我该怎么跟他谈，才不把人一棍子打死？",
+      "expected_behavior": "不应激活 two-points-one-focus，应激活 cure-illness-save-patient；后者是团结—批评—团结的内部批评方法（本 skill 与它 depends-on 相邻）",
+      "notes": "跨 skill 混淆诱饵：都涉及『别一棍子打死』，但焦点是对人的批评处理而非评价两面"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我查一下现在几点。",
+      "expected_behavior": "纯信息查询，不应激活任何方法论 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我就想知道这家公司是哪一年成立的。",
+      "expected_behavior": "不应激活 two-points-one-focus；B 段指出纯信息/事实查询无需两面权衡",
+      "notes": "边界：区分『需要两面评价的问题』与『纯事实查询』"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "A 方案和 B 方案二选一，到底选哪个？",
+      "expected_behavior": "一般不应激活本 skill；B 段指出两面并非同一对象的两面、只是简单二选一时，属取舍问题，应走 principal-contradiction 或决策类 skill",
+      "notes": "边界：区分『同一对象的两面评价』与『异对象二选一取舍』"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，指向高混淆对 principal-contradiction 与相邻的 cure-illness-save-patient）+ 2 条 edge_case。全部 should_not_trigger 必须通过。"
+}

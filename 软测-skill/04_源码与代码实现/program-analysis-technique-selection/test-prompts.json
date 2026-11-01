@@ -1,0 +1,73 @@
+{
+  "skill": "program-analysis-technique-selection",
+  "version": "0.1.0",
+  "source_book": "《逆向与漏洞分析》 魏强、武泽慧",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "pats-01",
+      "type": "should_trigger",
+      "prompt": "手上只有一个闭源二进制，给我三天时间找内存漏洞，团队只会跑 fuzz，我该先做静态分析还是直接上模糊测试？",
+      "expected_behavior": "应激活 program-analysis-technique-selection，盘点源码/IR、规模、输入通道、崩溃 oracle、插桩五个约束，排除不可用技术后按信息增益、成功率与成本排序，并设计静态与 fuzz 的组合流水线。",
+      "notes": "典型触发：无线索、时间有限，需要在多类分析技术间分配预算。"
+    },
+    {
+      "id": "pats-02",
+      "type": "should_trigger",
+      "prompt": "扫描器一下报了几百条告警，我没法全看，怎么判断哪些值得动态验证、哪些人工复核就行？",
+      "expected_behavior": "应激活 program-analysis-technique-selection，按“预期信息增益×成功概率÷成本”给告警分诊，安排静态复核与动态验证的先后顺序和预算。",
+      "notes": "典型触发：扫描器告警分诊，需要决定哪些交给动态验证、哪些人工复核。"
+    },
+    {
+      "id": "pats-03",
+      "type": "should_trigger",
+      "prompt": "只有一个二进制、时间只有三天，static or fuzz 先做哪个，预算怎么在几种分析技术之间分配？",
+      "expected_behavior": "应激活 program-analysis-technique-selection，先明确交付物与截止时间，再在静态数据流/污点、符号执行与 fuzz 之间做预算分配，并设置每段的止损点。",
+      "notes": "含英文 trigger（static or fuzz / budget allocation），验证中英混合选型表达。"
+    },
+    {
+      "id": "pats-04",
+      "type": "should_trigger",
+      "prompt": "老板让我一周内给这个软件做一轮安全评估，我不知道该从读代码、跑工具还是构造输入开始，怎么安排才不白费力气？",
+      "expected_behavior": "应激活 program-analysis-technique-selection，把“一周安全评估”拆成目标与可验收交付物，盘点五个约束，排出读代码、跑工具与构造输入的先后顺序及预算。",
+      "notes": "不含术语但情境相同：无明确技术路线，需要在静态、动态与 fuzz 间做计划。"
+    },
+    {
+      "id": "pats-05",
+      "type": "should_not_trigger",
+      "prompt": "样本已经能稳定复现崩溃，栈回溯也拿到了，现在只想定位到具体哪一行代码写坏的，从哪查？",
+      "expected_behavior": "不应激活 program-analysis-technique-selection，应激活 crash-to-root-cause，因为已有稳定崩溃与栈回溯，属于根因定位，而不是无线索时的技术选型。",
+      "notes": "跨 skill 诱饵：已有崩溃的根因定位属于 crash-to-root-cause；本 skill 明确不处理该场景。"
+    },
+    {
+      "id": "pats-06",
+      "type": "should_not_trigger",
+      "prompt": "我想装个符号执行工具 KLEE，帮我把依赖和编译步骤弄一下，能跑个 demo 就行。",
+      "expected_behavior": "不应激活 program-analysis-technique-selection，应激活 none，因为只是安装并跑通工具，没有在多种分析技术之间做选择或分配预算。",
+      "notes": "无关诱饵：单纯安装符号执行工具，不涉及选型、组合或预算。"
+    },
+    {
+      "id": "pats-07",
+      "type": "should_not_trigger",
+      "prompt": "帮我在这个源码目录里把所有 strcpy 调用点列出来，我只要清单，不用分析能不能被利用。",
+      "expected_behavior": "不应激活 program-analysis-technique-selection，应激活 none，因为只需列 strcpy 调用点的单点语法检查，模式匹配成本更低，做四类技术选型属于过度工程。",
+      "notes": "无关诱饵：一次性语法扫描，不需要数据流、污点、符号执行或 fuzz 的预算分配。"
+    },
+    {
+      "id": "pats-08",
+      "type": "edge_case",
+      "prompt": "fuzz 卡在格式校验上覆盖率不涨，我不想盲目加机器，想判断该补数据流、污点还是符号执行，预算怎么切？",
+      "expected_behavior": "应激活 program-analysis-technique-selection，但需限定：先判断是否只是种子、字典或校验和关卡问题（若是应回 coverage-guided-fuzzing）；确认要补跨技术能力后，再在数据流、污点、符号执行间分配预算并设止损点。",
+      "notes": "边界上应调用：表面是覆盖率不涨，实际问的是跨技术补强与预算，处于 coverage-guided-fuzzing 与选型的交界。"
+    },
+    {
+      "id": "pats-09",
+      "type": "edge_case",
+      "prompt": "目标是个纯业务逻辑漏洞，权限校验写错了，既没有崩溃也没有语义 oracle，还需要在四种分析技术里选吗？",
+      "expected_behavior": "可以激活 program-analysis-technique-selection，但必须给出“不需要在这四类技术中选”的结论并说明理由：纯业务逻辑漏洞没有崩溃或语义 oracle，四类技术看不到，硬做选型会制造“已覆盖”的假象，应转人工审计；给出具体技术组合或预算分配才算不通过。",
+      "notes": "边界：用户直接问“还需不需要选型”，激活本 skill 回答“不需要”是合理的；关键看是否给出拒绝选型的结论，而不是是否激活。"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "共 9 条：4 条应触发（2 典型、1 英文 trigger、1 无术语同情境）、3 条不应触发（已有崩溃根因定位、单纯装符号执行工具、一次性 strcpy 语法扫描）、2 条边界（fuzz 覆盖率停滞但问跨技术预算应调用且需限定；纯逻辑漏洞无 oracle 不应调用）。重点防 crash-to-root-cause、coverage-guided-fuzzing 与本 skill 的“选方法 vs 用方法”混淆。"
+}

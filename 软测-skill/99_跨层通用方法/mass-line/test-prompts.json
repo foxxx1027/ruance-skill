@@ -1,0 +1,59 @@
+{
+  "skill": "mass-line",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们要给一线工人做一套新的考核制度，可我们几个领导自己谁也不了解他们实际怎么干，特别怕闭门造车，该怎么办？",
+      "expected_behavior": "调用 mass-line，先明确『群众』是谁并采集分散意见，加工成系统方案，再回到一线宣传解释、化为行动并在行动中检验、再集中修正",
+      "notes": "正面场景：为不熟悉的一线做方案、怕闭门造车，命中 A2 情境 1 与语言信号『怎么避免闭门造车』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "每次上面出的方案到一线就没法落地，员工根本不买账，推行不下去，问题出在哪？",
+      "expected_behavior": "调用 mass-line，指出只征集不回程（只上不下）不算群众路线，须把方案拿回一线解释、听取反应、化为可执行的行动",
+      "notes": "正面场景：方案落地不了、用户不买账，命中 A2 情境 3 与语言信号『方案落地不了』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我想建一套能长期跑起来的员工反馈机制，不是发一次问卷就完事，怎么才能形成真正有用的循环？",
+      "expected_behavior": "调用 mass-line，建立『收集—加工—回群众—行动检验—再集中』的可持续闭环，而非一次性问卷",
+      "notes": "正面场景：建立持续反馈闭环，命中 A2 情境 4 与语言信号『怎么建立反馈闭环』"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我对这块业务完全不熟，是不是得先花时间做一次调查、开个能听到真话的座谈会？",
+      "expected_behavior": "不应激活 mass-line，应激活 investigation-method（调查研究法，取证前置动作）；本 skill 是收集—加工—回群众—检验—再集中的完整闭环，此处只问取证这一步",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：都涉及『下去听一线』，但此处焦点是取证前置，属 investigation-method（二者 composes-with）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "公司要在全国门店推一套新流程，我是先挑几家试点，还是直接一刀切铺开？",
+      "expected_behavior": "不应激活 mass-line，应激活 general-call-individual-guidance（一般号召与个别指导，试点先行）；本 skill 是意见循环上升程序，此处是推广节奏与典型选择",
+      "notes": "跨 skill 混淆诱饵：都涉及『先从少数单位开始再推开』，但此处是推广/领导技术，属 general-call-individual-guidance（二者 composes-with）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我算一下这个月团队报销的总额，把发票金额加一下。",
+      "expected_behavior": "纯数据处理，不应激活任何反馈/方法论 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "这个决策涉及公司并购、高度保密，还能走从一线收集意见、再拿回去讨论那一套吗？",
+      "expected_behavior": "不应激活 mass-line；按 B 段，需要保密或必须极速决断、来不及走完整闭环的场合不适用本方法",
+      "notes": "边界：方法的闭环依赖反馈渠道畅通且不涉密，保密/极速决断场景属 B 段排除"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 investigation-method 与 general-call-individual-guidance）+ 1 条 edge_case。全部 should_not_trigger 必须通过。"
+}

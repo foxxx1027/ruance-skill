@@ -1,0 +1,52 @@
+{
+  "skill": "vuln-essence-classification",
+  "version": "0.1.0",
+  "source_book": "《漏洞战争：软件漏洞分析精要》 林桠泉",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "一个后台管理系统没做任何鉴权就暴露在外网，这算漏洞吗？该怎么分析？",
+      "expected_behavior": "激活 vuln-essence-classification，先判定它落在'安全策略缺陷'面，再指向配置/权限模型审计路径",
+      "notes": "正面：策略面归类的典型"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "这个洞到底是代码写错了，还是配置没配好？",
+      "expected_behavior": "激活本 skill，用二元分类（程序世界缺陷 vs 安全策略缺陷）给出判定与后续路径差异",
+      "notes": "正面：直接询问成因面"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我们 SRC 收到一份报告：内部管理接口没做鉴权就能直接调用。这该走代码修复，还是按配置/策略整改来处理？",
+      "expected_behavior": "激活本 skill，用二元分类判定它落在'安全策略缺陷'面（入口是缺少鉴权判断而非判断本身有逻辑缺陷），再指向配置/权限模型审计路径",
+      "notes": "正面：策略面归类的典型。（原第 12 章'云安全的本质'一问过于开放、盲测未通过，按阶段 4'修测试并记录理由'改为更明确的归类场景）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "帮我看看这段汇编里的调用约定是 cdecl 还是 stdcall",
+      "expected_behavior": "不应激活；纯技术细节查询，与漏洞成因面归类无关",
+      "notes": "诱饵：二进制话题但非归类问题"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "这个溢出漏洞怎么定位到具体的漏洞函数？",
+      "expected_behavior": "不应激活本 skill；应激活 crash-to-root-cause（已确定是程序面缺陷，进入定位执行）",
+      "notes": "跨 skill 混淆诱饵：归类已完成，进入执行"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "这个 bug 算不算一个安全漏洞？",
+      "expected_behavior": "边界：可以激活本 skill（这正是它的用途——定性），但必须先判成因面再下结论，不能说'是 bug 就是漏洞'",
+      "notes": "边界：'算不算漏洞'的定性请求"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "至少 3 条 should_trigger + 2 条 should_not_trigger + 1 条 edge_case。全部 should_not_trigger 必须通过（诱饵容错为 0），且其中至少 1 条是同书兄弟 skill 的场景（跨 skill 混淆测试）。"
+}

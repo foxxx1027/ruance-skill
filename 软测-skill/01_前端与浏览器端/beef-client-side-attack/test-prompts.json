@@ -1,0 +1,73 @@
+{
+  "skill": "beef-client-side-attack",
+  "version": "0.1.0",
+  "source_book": "《灰帽黑客 第4版》 — Daniel Regalado 等",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "XSS 已经能在页面执行，怎么用 BeEF 挂钩并维持会话？",
+      "expected_behavior": "应激活本 skill，给出 hook 脚本、会话维持与模块选择步骤",
+      "notes": "正面：BeEF 挂钩"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "BeEF 里怎么根据浏览器指纹选择模块？",
+      "expected_behavior": "应激活本 skill，按浏览器/插件/OS 指纹筛选可用模块",
+      "notes": "正面：指纹与模块"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "Autorun 规则怎么编排，才能批量做客户端信息收集？",
+      "expected_behavior": "应激活本 skill，按优先级与依赖编排 Autorun",
+      "notes": "正面：Autorun"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "WAF 挡住了我的 XSS payload，怎么用编码绕过？",
+      "expected_behavior": "不应激活本 skill，应激活同书 web-encoding-filter-bypass",
+      "notes": "跨 skill 混淆诱饵（硬性要求）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "帮我写一个 Metasploit 漏洞利用模块",
+      "expected_behavior": "不应激活本 skill，应走 metasploit-module-development",
+      "notes": "诱饵：利用模块开发"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "这个浏览器 UAF 怎么构造利用链？",
+      "expected_behavior": "不应激活本 skill，应激活同书 browser-heap-spray-and-uaf 或 exploit-chain-construction",
+      "notes": "诱饵：内存利用"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "BeEF 挂钩成功但浏览器一会儿就掉了，怎么保持？",
+      "expected_behavior": "应激活本 skill，检查 hook 持久化、页面跳转与网络中断",
+      "notes": "边界：会话维持"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "客户只授权测试一个域名，BeEF 能不能顺带控制内网主机？",
+      "expected_behavior": "不应激活本 skill 直接执行，应先回到 pentest-engagement-and-disclosure 的授权与范围门禁",
+      "notes": "边界：客户端后渗透的授权越界"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "怎么用 BeEF 做一个钓鱼页面并收集凭据？",
+      "expected_behavior": "应激活本 skill 的客户端攻击模块，但需先确认授权与凭据处理边界",
+      "notes": "边界：钓鱼与凭据收集"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含至少 1 条同书兄弟 skill 混淆诱饵）+ 3 条 edge_case；全部 should_not_trigger 必须通过。"
+}

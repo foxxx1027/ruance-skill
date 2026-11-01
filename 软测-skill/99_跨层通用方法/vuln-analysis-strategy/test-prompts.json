@@ -1,0 +1,52 @@
+{
+  "skill": "vuln-analysis-strategy",
+  "version": "0.1.0",
+  "source_book": "《漏洞战争：软件漏洞分析精要》 林桠泉",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "手上只有一个能复现的崩溃样本，没有补丁也没有源码，我该从哪下手？",
+      "expected_behavior": "激活 vuln-analysis-strategy，先做类型判别与层次判定，再按成本刻度给出方法优先级（并说明为何排除其它方法）",
+      "notes": "正面：典型'动手前先选题'场景"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "分析微软自己的组件，该用 WinDbg 还是 OllyDbg？",
+      "expected_behavior": "激活 vuln-analysis-strategy，给出'平台+权限层+目的'的工具—场景映射，而非只报一个工具名",
+      "notes": "正面：工具选型"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "这个漏洞到底是栈溢出还是 UAF，怎么判断？",
+      "expected_behavior": "激活 vuln-analysis-strategy，用类型判别法先定性，再据此指向对应定位路径",
+      "notes": "正面：类型判别"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "帮我把这个样本里的 Shellcode 解出来并还原出载荷",
+      "expected_behavior": "不应激活本 skill；应激活 malware-sample-analysis（样本载荷提取属样本分析流程）",
+      "notes": "诱饵：误把'动手执行'当成'选方法'"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我有补丁前后的两个 dll，想找出被修复的漏洞在哪",
+      "expected_behavior": "不应激活本 skill；应激活 patch-diff-and-source-analysis（已在'有补丁'这一明确分支上，无需再做方法选择）",
+      "notes": "跨 skill 混淆诱饵：与补丁比较 skill 抢调用"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "在一个分支上跟了两个小时没有任何新进展，要不要换个方向？",
+      "expected_behavior": "边界：可激活本 skill（分析纪律/止损判据属其内容），但要给出'何时算触发换点、往哪个方向换'的可执行判据，而不是泛泛鼓励坚持或放弃",
+      "notes": "边界：既是纪律问题，也可能只是情绪抱怨"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "至少 3 条 should_trigger + 2 条 should_not_trigger + 1 条 edge_case。全部 should_not_trigger 必须通过（诱饵容错为 0），且其中至少 1 条是同书兄弟 skill 的场景（跨 skill 混淆测试）。"
+}

@@ -1,0 +1,76 @@
+{
+  "skill": "web-minimal-exposure",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "公司官网放在云服务器上，除了开 80 和 443 端口，还要注意什么？",
+      "expected_behavior": "调用本 skill，盘点暴露面并建立权限矩阵，而不是只回答端口清单",
+      "notes": "正面场景：上线前加固"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "网站的备份文件和数据库好像能被 URL 直接下载，怎么处理？",
+      "expected_behavior": "调用本 skill，把数据库与备份移出 Web 根并阻断 HTTP 访问",
+      "notes": "正面场景：数据库与备份暴露"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "上传目录里的 php 文件能被浏览器访问并执行，是不是很危险？",
+      "expected_behavior": "调用本 skill，把上传目录收敛为可写不可执行，并检查应用账号权限",
+      "notes": "正面场景：上传目录可执行"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "已经上了 WAF，是不是目录权限和数据库位置就不用管了？",
+      "expected_behavior": "调用本 skill，说明 WAF 不能替代权限收敛，数据库仍可被直接下载时风险未修复",
+      "notes": "正面场景：WAF 替代权限的误区"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "帮我看看这个 IIS 是什么版本，有没有对应的已知漏洞。",
+      "expected_behavior": "不应调用本 skill，应调用 middleware-fingerprint-and-triage",
+      "notes": "跨书诱饵：中间件指纹"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "网站正在被 DDoS，怎么清洗流量、要不要买高防？",
+      "expected_behavior": "不应调用本 skill，这是可用性与容量清洗问题",
+      "notes": "诱饵：DDoS"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "Windows 服务器默认共享要不要关，Administrator 要不要改名？",
+      "expected_behavior": "不应调用本 skill，应调用 host-default-surface-convergence",
+      "notes": "同书兄弟诱饵：主机默认值"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "数据库暂时不能移出 Web 根，有什么临时办法？",
+      "expected_behavior": "调用本 skill，先用 Web 服务器规则阻断数据库文件的 HTTP 访问，并明确记为临时补偿",
+      "notes": "边界：无法立即迁移"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "网站是 React 打包的静态站，放在对象存储上，这套权限矩阵怎么套？",
+      "expected_behavior": "调用本 skill 的模型，但把 Web 根、上传目录、应用账号重新映射到对象存储与 CDN",
+      "notes": "边界：现代部署形态"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "我只想修 SQL 注入的代码，需要看这个 skill 吗？",
+      "expected_behavior": "不把本 skill 当作代码修复方案；它只给结构性约束，参数化查询与输入校验仍需代码层修复",
+      "notes": "边界：代码层修复"
+    }
+  ]
+}

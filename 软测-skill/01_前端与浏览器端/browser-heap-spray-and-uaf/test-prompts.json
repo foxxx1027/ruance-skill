@@ -1,0 +1,73 @@
+{
+  "skill": "browser-heap-spray-and-uaf",
+  "version": "0.1.0",
+  "source_book": "《灰帽黑客 第4版》 — Daniel Regalado 等",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "IE 里 UAF 后对象被释放，怎么用 Heap Spray 占住同一块内存？",
+      "expected_behavior": "应激活本 skill，给出喷射对象、等大填充与落点验证步骤",
+      "notes": "正面：IE 堆喷射"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "Flash 的 Vector 喷射总是落不准，怎么验证落点？",
+      "expected_behavior": "应激活本 skill，用可识别标记与调试器确认落点，再调整喷射量",
+      "notes": "正面：Flash 喷射"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "LFH 没激活，重占一直失败，怎么把缓存箱耗尽？",
+      "expected_behavior": "应激活本 skill，先耗尽缓存箱再触发释放与重占",
+      "notes": "正面：LFH 重占"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "Windows 栈溢出怎么绕过 SEHOP？",
+      "expected_behavior": "不应激活本 skill，应激活同书 windows-exploit-and-mitigation-bypass",
+      "notes": "跨 skill 混淆诱饵（硬性要求）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "普通 Windows 进程的 UAF 怎么占坑？",
+      "expected_behavior": "不应激活本 skill，应走通用 heap-exploitation",
+      "notes": "诱饵：通用堆利用"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我分析这个 Chrome V8 漏洞的根因",
+      "expected_behavior": "不应激活本 skill，本书只覆盖 IE/Flash 时代的堆喷射与 UAF，现代浏览器分配器超出边界",
+      "notes": "诱饵：现代浏览器"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "浏览器崩在释放后的虚表调用，怎么证明是 UAF 而不是普通溢出？",
+      "expected_behavior": "应激活本 skill，用引用计数、释放点与重占前后对象内容做根因证明",
+      "notes": "边界：根因证明"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "堆喷射的 shellcode 在 DEP 下不能执行，怎么办？",
+      "expected_behavior": "可先激活本 skill 确认喷射落点，也可直接走 windows-exploit-and-mitigation-bypass 处理 DEP；关键是落点未验证时不要盲目换 payload",
+      "notes": "边界：喷射之后需要绕过 DEP（测试预期放宽：两条路由均合理）"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "Chrome 的 PartitionAlloc 下还能用这套喷射吗？",
+      "expected_behavior": "不应激活本 skill，分配器与隔离堆已变化，应走现代浏览器利用方法",
+      "notes": "边界：现代分配器"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含至少 1 条同书兄弟 skill 混淆诱饵）+ 3 条 edge_case；全部 should_not_trigger 必须通过。"
+}

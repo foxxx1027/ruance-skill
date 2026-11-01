@@ -1,0 +1,59 @@
+{
+  "skill": "general-call-individual-guidance",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "公司要在全国三百家门店推一套新的服务流程，是发个通知一刀切直接铺开，还是先挑几家试？我怕推得太急全乱套。",
+      "expected_behavior": "调用 general-call-individual-guidance，先发一般号召，再选二三个有代表性的门店突破取得经验、用它检验并充实号召，之后波浪式分阶段推广",
+      "notes": "正面场景：多地推广新做法、一刀切还是分批，命中 A2 情境 1、2"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "上面发了个新制度，每次一到基层执行就走样，有的干脆不了了之，怎么推广才能落地不走样？",
+      "expected_behavior": "调用 general-call-individual-guidance，指出只发号召会落空，须领导亲自扎下去把少数单位做通、拿到可复制经验再推广",
+      "notes": "正面场景：号召发下去执行走样，命中 A2 情境 3 与语言信号『怎么落地不走样』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "团队里有两个标杆特别能打，也有一批拖后腿的，剩下大多数不温不火，怎么把中间这批人带起来？",
+      "expected_behavior": "调用 general-call-individual-guidance，抓两头带中间——分别说清抓好最好与最差两头各做什么，借此带动中间多数",
+      "notes": "正面场景：带动中间多数，命中 A2 情境 4 与语言信号『怎么带动中间那批人』"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我想把一线员工的零散意见收上来，加工成一套方案，再拿回一线让大家用起来、边用边检验，怎么建这条链路？",
+      "expected_behavior": "不应激活 general-call-individual-guidance，应激活 mass-line（群众路线，收集—加工—回群众—检验—再集中的双向闭环）；本 skill 是号召—试点—推广的推进技术，不负责意见循环",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：两 skill 都涉及『从一线来、到一线去』，但此处是意见闭环程序，属 mass-line（二者 composes-with）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我们对这个新市场完全没概念，是不是得先花时间把一线的真实情况搞清楚，再谈别的？",
+      "expected_behavior": "不应激活 general-call-individual-guidance，应激活 investigation-method（调查研究法，取证前置）；本 skill 是推广前的取证之后的落地扩散，此处尚在『要不要先调查』阶段",
+      "notes": "跨 skill 混淆诱饵：都涉及『先小范围了解再推开』，但此处是取证本身，属 investigation-method"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我把这段英文的合同条款准确翻译成中文。",
+      "expected_behavior": "纯翻译任务，不应激活任何推广/领导类 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们这个项目就是做一个客户、做完就结束，这种还要先试点再推广吗？",
+      "expected_behavior": "不应激活 general-call-individual-guidance；按 B 段，只做一次、无需向其他单位推广的单一任务，谈不上号召与推广",
+      "notes": "边界：方法以『有多个单位、需要推广』为前提，一次性单一任务属 B 段排除"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 mass-line 与 investigation-method）+ 1 条 edge_case。全部 should_not_trigger 必须通过。"
+}

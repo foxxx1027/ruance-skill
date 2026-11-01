@@ -1,0 +1,59 @@
+{
+  "skill": "function-and-exception-safety",
+  "version": "0.1.0",
+  "source_book": "信息安全技术 应用软件安全编程指南（GB/T 38674-2020） — 国家市场监督管理总局、国家标准化管理委员会",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "开放 API 里 catch 到异常只打了一行日志，然后照样返回成功，这有问题吗？",
+      "expected_behavior": "应激活 function-and-exception-safety，并指出空处理会把失败伪装成成功，要求精确捕获具体异常、在失败分支返回可判定的错误，并保证数据状态一致。",
+      "notes": "正面场景：静默失败与异常吞掉，是该 skill 的核心触发点。"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "线上错误页把完整堆栈和服务器绝对路径返回给前端了，应该怎么处理？",
+      "expected_behavior": "应激活 function-and-exception-safety，并要求对外只返回通用提示与追踪号，堆栈、路径、会话标识只进受保护的内部日志，同时统一不同失败原因的对外表现。",
+      "notes": "正面场景：错误信息过度暴露，属于本 skill 的信息面要求（非诱饵）。"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "Should a public SDK method validate null and range for every argument, or just trust the caller?",
+      "expected_behavior": "应激活 function-and-exception-safety，并先写出函数契约（数量、顺序、类型、取值范围与非法输入处理），标明哪些参数来自信任边界之外，再决定运行时校验。",
+      "notes": "英文正向场景：对外 SDK 的参数校验策略，测试双语触发。"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "String.format 的模板串里混进了用户输入，会不会被 %s、%n 这些搞出问题？",
+      "expected_behavior": "应激活 function-and-exception-safety，并要求格式串写死、用户输入只能作为参数传入，防止格式符读取内部值或抛出异常造成拒绝服务。",
+      "notes": "正面场景：不可信数据充当格式化串，同时涉及失败分支。"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "线上日志里要不要把完整堆栈打出来？打多了怕泄露，打少了又查不到",
+      "expected_behavior": "不应激活本 skill，应激活 logging-security，因为争点是日志该记录什么内容、如何防注入与防泄露，而不是错误文本对用户暴露到什么程度。",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：堆栈进内部日志属于 logging-security 的日志内容决策，本 skill 只管对外错误信息的最小化。"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "接口返回 200 但前端提示网络错误，是不是网关超时时间配短了？",
+      "expected_behavior": "不应激活本 skill，因为这是网关超时与链路配置的排查，不涉及函数契约、异常语义或错误信息设计。",
+      "notes": "诱饵：带“返回 200 / 错误”字样的运维排查，检验是否会因失败现象误触发。"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "模块内部的工具函数只被同包调用，参数都是枚举，还需要每个都判空吗？",
+      "expected_behavior": "通常不应激活本 skill：参数由编译期类型系统完全约束且不跨信任边界的内部函数，可标注为编译期保证并跳过运行时校验；一旦该函数对外暴露、接收反序列化数据或跨进程调用，则应按 function-and-exception-safety 补齐契约与校验。",
+      "notes": "边界：区分“编译期已保证的内部函数”与“跨信任边界的对外函数”，避免无差别要求判空。"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条正向覆盖异常吞掉、错误信息外泄、SDK 参数契约（英文）、格式化串；2 条诱饵中 1 条为兄弟 skill logging-security 的日志内容问题，另 1 条为网关超时排查；边界题检验内部函数是否可免于运行时校验。所有 should_not_trigger 必须通过。"
+}

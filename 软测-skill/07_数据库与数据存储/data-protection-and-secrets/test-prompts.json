@@ -1,0 +1,76 @@
+{
+  "skill": "data-protection-and-secrets",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "st-01",
+      "type": "should_trigger",
+      "prompt": "我们后台导出的 Excel 里手机号和身份证都是完整的，页面倒是打了星号，这种算不算泄露？",
+      "expected_behavior": "调用 data-protection-and-secrets；先按数据级别核对展示、导出、接口与日志的脱敏一致性，再用合成数据做最小对照，确认是仅前端遮挡还是服务端未脱敏。",
+      "notes": "典型的前端遮挡与服务端未脱敏不一致，属于五类泄露通道与脱敏核查。"
+    },
+    {
+      "id": "st-02",
+      "type": "should_trigger",
+      "prompt": "代码仓库历史里翻到一串云访问密钥，现在还在用，我想知道影响面和怎么换。",
+      "expected_behavior": "调用 data-protection-and-secrets；建密钥位置与权限表，确认用途、持有者、轮换与失效机制，按授权流程通知并给出轮换建议。",
+      "notes": "硬编码密钥与轮换权限是第 5 类核心。"
+    },
+    {
+      "id": "st-03",
+      "type": "should_trigger",
+      "prompt": "客户安全问卷要我们说明数据分级、传输加密、备份加密和留存期限，从哪查起？",
+      "expected_behavior": "调用 data-protection-and-secrets；先建数据分类分级清单，再依次核查传输、存储、备份、脱敏与留存证据。",
+      "notes": "合规问卷场景，需要工程证据而非条款复述。"
+    },
+    {
+      "id": "st-04",
+      "type": "should_trigger",
+      "prompt": "运维说日志平台能直接搜到用户银行卡号，还带完整请求参数，帮我把泄露通道都过一遍。",
+      "expected_behavior": "调用 data-protection-and-secrets；逐条排查日志、报错、前端源码、接口返回与第三方上报五个通道，记录字段与触发条件。",
+      "notes": "日志泄露只是入口，需要扩展为完整泄露面核查。"
+    },
+    {
+      "id": "snt-01",
+      "type": "should_not_trigger",
+      "prompt": "我们的备份每周都做，但从来没演练过恢复，怎么确认真能还原？",
+      "expected_behavior": "不应调用本 skill；应调用 data-backup-recovery-discipline，核查备份可还原性与恢复演练。",
+      "notes": "关注可还原性而非备份加密或数据分级。"
+    },
+    {
+      "id": "snt-02",
+      "type": "should_not_trigger",
+      "prompt": "怀疑有人删了服务器上的登录日志，怎么判断日志有没有被改过、证据还完整吗？",
+      "expected_behavior": "不应调用本 skill；应调用 log-integrity-and-evidence，核查日志完整性与证据链。",
+      "notes": "关注日志是否被篡改，不是日志内容是否含敏感数据。"
+    },
+    {
+      "id": "snt-03",
+      "type": "should_not_trigger",
+      "prompt": "官网根目录下能直接下到 www.zip 和 .env.bak，这种暴露怎么收敛？",
+      "expected_behavior": "不应调用本 skill；应调用 web-minimal-exposure，收敛 Web 根目录与可下载文件暴露面。",
+      "notes": "先解决文件可被直接下载，再评估内容是否含密钥。"
+    },
+    {
+      "id": "ec-01",
+      "type": "edge_case",
+      "prompt": "对象存储桶被设成公共读了，里面是用户上传的合同，先处理哪个？",
+      "expected_behavior": "调用 cloud-and-container-baseline（或转 data-protection-and-secrets）；先关闭公共读并核查桶策略与 IAM，再评估合同数据的加密、脱敏与影响范围。",
+      "notes": "题目问「先处理哪个」；配置暴露优先止血与数据分级定优先级两个入口都成立。"
+    },
+    {
+      "id": "ec-02",
+      "type": "edge_case",
+      "prompt": "前端打包文件里搜到一条地图服务的 key，但它是公开只读的，这也要按密钥泄露处理吗？",
+      "expected_behavior": "调用 data-protection-and-secrets；核对 key 的权限范围、配额与滥用风险，区分“设计上可公开”与“权限过宽”，再决定是否轮换与加限制。",
+      "notes": "不是所有前端 key 都等同高危泄露，需要按权限与用途判定。"
+    },
+    {
+      "id": "ec-03",
+      "type": "edge_case",
+      "prompt": "我们用了云厂商默认加密，合规同事说还不够，到底要不要自管密钥？",
+      "expected_behavior": "调用 data-protection-and-secrets；按数据级别与威胁模型评估密钥归属、权限分离与轮换要求，给出平台托管或自管密钥的选择依据。",
+      "notes": "默认加密与密钥隔离是两件事，需要按数据级别判断。"
+    }
+  ]
+}

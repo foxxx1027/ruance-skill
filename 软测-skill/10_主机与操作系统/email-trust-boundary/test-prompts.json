@@ -1,0 +1,76 @@
+{
+  "skill": "email-trust-boundary",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "收到一封自称财务的邮件，附件是工资表.zip，能不能打开？",
+      "expected_behavior": "调用本 skill，先隔离不打开，再做附件/地址/退信三查",
+      "notes": "正面场景：可疑附件"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "收到一封退信，附件写着邮件正文，但我最近没发过这封信。",
+      "expected_behavior": "调用本 skill，按假冒退信处理，不打开附件，核对发件地址与发信记录",
+      "notes": "正面场景：真伪退信"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "发件人显示名是老板，但完整地址是 gmail，这封邮件可信吗？",
+      "expected_behavior": "调用本 skill，区分显示名与完整地址，用独立渠道核实",
+      "notes": "正面场景：显示名冒充"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "重要邮箱老拿去注册网站，垃圾邮件越来越多，怎么分？",
+      "expected_behavior": "调用本 skill，划分重要邮箱与备用邮箱，重要邮箱退出外部注册",
+      "notes": "正面场景：邮箱分层"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "邮箱密码好像被盗了，已经被顶下线，先改密还是先冻结？",
+      "expected_behavior": "不应调用本 skill，应调用 account-compromise-layering 做账号止损",
+      "notes": "同书兄弟诱饵：账号失守"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "附件我已经双击了，电脑开始弹窗，现在怎么办？",
+      "expected_behavior": "不应继续做邮件三查，应先隔离主机并转 malware-triage-order",
+      "notes": "跨书诱饵：附件已执行"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "怎么给公司域名配置 SPF 和 DKIM？",
+      "expected_behavior": "不应调用本 skill，这属于邮件网关与 DNS 配置，超出本书范围",
+      "notes": "诱饵：协议配置"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "熟人发来的邮件，附件是正常 docx，但他最近被盗号了。",
+      "expected_behavior": "调用本 skill，说明发件人可信不等于内容可信，仍用独立渠道核实",
+      "notes": "边界：熟人账号被盗"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "公司邮件网关已经拦了 99% 的垃圾邮件，员工还需要做三查吗？",
+      "expected_behavior": "调用本 skill，保留默认不信任与三查，网关只是降低噪声",
+      "notes": "边界：网关与用户侧判据"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "邮件附件是个 .scr 屏幕保护程序，说是 invoice，这是什么？",
+      "expected_behavior": "调用本 skill，把 .scr 视为可执行附件，按恶意邮件隔离",
+      "notes": "边界：可执行附件类型"
+    }
+  ]
+}

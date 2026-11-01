@@ -1,0 +1,76 @@
+{
+  "skill": "usb-autorun-hardening",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "U 盘插上就自动弹东西，是不是中了 autorun 病毒？",
+      "expected_behavior": "调用本 skill，先查根目录隐藏文件再决定打开",
+      "notes": "正面：autorun 现象"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "怎么彻底关闭 Windows 的自动播放？组策略关了好像没用",
+      "expected_behavior": "调用本 skill，检查三条路径",
+      "notes": "正面：关闭不彻底"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "工控机不能联网，只能用 U 盘拷文件，怎么降低风险？",
+      "expected_behavior": "调用本 skill，入口封堵+操作规程+离线限制",
+      "notes": "正面：离线环境"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "U 盘根目录多了个隐藏的 autorun.inf，怎么办？",
+      "expected_behavior": "调用本 skill，先查杀再处理，不双击",
+      "notes": "正面：已出现可疑文件"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "怎么把 U 盘格式化成 exFAT",
+      "expected_behavior": "不调用本 skill，这是普通磁盘操作",
+      "notes": "诱饵：格式化"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "这台机器 CPU 100%，怀疑挖矿",
+      "expected_behavior": "应调用 malware-triage-order",
+      "notes": "跨 skill 诱饵：已感染处置"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "BitLocker 加密后忘记密码怎么办",
+      "expected_behavior": "不调用本 skill 的入口封堵，转数据恢复/密钥管理",
+      "notes": "诱饵：加密恢复"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "现代 Windows 不是已经不支持 U 盘 autorun 了吗，还需要关吗？",
+      "expected_behavior": "应触发，解释仍需防手动双击与其他介质",
+      "notes": "边界：机制已变化"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "公司禁止用 U 盘，是不是就不用管 autorun 了？",
+      "expected_behavior": "应触发，讲策略例外与外部介质",
+      "notes": "边界：管理策略替代"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "U 盘根目录出现隐藏的 autorun.inf，但还没打开过，先做什么？",
+      "expected_behavior": "应触发，先查杀并阻断 autorun，不要双击",
+      "notes": "边界：可疑但未执行"
+    }
+  ]
+}

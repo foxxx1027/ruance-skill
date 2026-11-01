@@ -1,0 +1,59 @@
+{
+  "skill": "network-transport-and-session",
+  "version": "0.1.0",
+  "source_book": "信息安全技术 应用软件安全编程指南（GB/T 38674-2020） — 国家市场监督管理总局、国家标准化管理委员会",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "测试环境证书报错，同事说直接信任所有证书跳过校验，上线会有风险吗？",
+      "expected_behavior": "应激活 network-transport-and-session，并说明关闭校验后只剩加密、没有对端身份认证，应同时验证书链、有效期与主机名，且握手失败只能断开或重试安全连接，不得降级。",
+      "notes": "正面场景：为跑通功能关闭证书校验，是该 skill 最典型的触发点。"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "用户登录成功后 session id 还是原来那个，渗透报告直接给了高危，怎么改？",
+      "expected_behavior": "应激活 network-transport-and-session，并要求登录成功、重新鉴别、HTTP 转 HTTPS 时都关闭旧会话并新建标识，标识由服务端或可信框架生成且足够随机。",
+      "notes": "正面场景：登录前后会话标识未轮换，对应会话固定问题（未直呼术语）。"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "Our payment callback already uses HTTPS — do we still need a timestamp and nonce to stop replay?",
+      "expected_behavior": "应激活 network-transport-and-session，并说明 HTTPS 只保护传输，需用时间戳与随机数联合判断新鲜性、对重要报文做摘要或签名，并定义时间窗与随机数存储过期策略。",
+      "notes": "英文正向场景：已有 HTTPS 是否还需防重放，测试双语触发。"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "后台管理的登录态配了永不过期，用起来方便，但安全上说得过去吗？",
+      "expected_behavior": "应激活 network-transport-and-session，并指出永不过期会把一次性鉴别变成永久通行证，应设置业务可接受的最小超时、登出彻底终止、重新鉴别后换新标识。",
+      "notes": "正面场景：会话超时缺失与生命周期管理。"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "JWT 里带了 roles 字段，后端直接拿来判断管理员，这样可靠吗？",
+      "expected_behavior": "不应激活本 skill，应激活 authorization-and-least-privilege，因为争点是能否信任令牌里的权限声明、每次请求是否按对象重新判定权限，而不是通道加密或会话标识本身。",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：JWT 易被传输/会话 skill 抢走，但权限字段的可信度属于授权问题。"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "首屏加载要 3 秒，图片压缩和 CDN 该怎么优化？",
+      "expected_behavior": "不应激活本 skill，因为这纯粹是前端性能与资源分发优化，不涉及传输通道认证、降级、重放或会话生命周期。",
+      "notes": "诱饵：带“加载/传输”语感的性能问题，检验是否会因网络相关字样误触发。"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "内网服务之间已经上了 mTLS，应用层还要不要自己做报文签名和防重放？",
+      "expected_behavior": "应激活 network-transport-and-session：mTLS 解决对端身份与传输加密，但不保证消息新鲜性与不可抵赖，仍需按业务风险决定时间戳加随机数的重放检测与报文签名，并说明内网不等于可信。",
+      "notes": "边界：mTLS 是否足以替代应用层签名与防重放，答案是需要分层判断，而非简单“够”或“不够”。"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条正向覆盖关闭证书校验、登录后 session 未换、HTTPS 下防重放（英文）、会话永不过期；2 条诱饵中 1 条为兄弟 skill authorization-and-least-privilege 的 JWT 权限字段问题，另 1 条为首屏性能优化；边界题检验 mTLS 与应用层签名/防重放的边界。所有 should_not_trigger 必须通过。"
+}

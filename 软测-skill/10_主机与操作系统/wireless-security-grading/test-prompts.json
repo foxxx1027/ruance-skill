@@ -1,0 +1,76 @@
+{
+  "skill": "wireless-security-grading",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "家里 Wi-Fi 密码改了还是被蹭，怎么办？",
+      "expected_behavior": "调用本 skill，先查 WPS 等旁路",
+      "notes": "正面：反复被蹭"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "路由器 WPS 要不要关？",
+      "expected_behavior": "调用本 skill，把 WPS 定位为旁路",
+      "notes": "正面：WPS 取舍"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "MAC 白名单能不能防蹭网？",
+      "expected_behavior": "调用本 skill，说明只是门槛",
+      "notes": "正面：准入控制"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "咖啡馆要给顾客 Wi-Fi，同时保护收银系统，怎么设计？",
+      "expected_behavior": "调用本 skill，访客隔离+强加密+关旁路",
+      "notes": "正面：分级组网"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "Wi-Fi 信号弱怎么增强覆盖",
+      "expected_behavior": "不调用本 skill，这是覆盖优化",
+      "notes": "诱饵：覆盖问题"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "公司要上 802.1X/RADIUS，怎么规划",
+      "expected_behavior": "不调用本 skill，这是企业无线架构",
+      "notes": "诱饵：企业认证"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "手机连不上 Wi-Fi 怎么排查",
+      "expected_behavior": "不调用本 skill，这是终端故障",
+      "notes": "诱饵：终端排障"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "隐藏 SSID 是不是就安全了？",
+      "expected_behavior": "应触发，解释隐藏不是边界",
+      "notes": "边界：可见性≠安全"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "老设备只支持 WEP，能不能先用着？",
+      "expected_behavior": "应触发，隔离测试或更换设备",
+      "notes": "边界：兼容与强度"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "WPA3 有些设备连不上，退回 WPA2 行不行？",
+      "expected_behavior": "应触发，允许过渡但不得退回 WEP/TKIP",
+      "notes": "边界：兼容取舍"
+    }
+  ]
+}

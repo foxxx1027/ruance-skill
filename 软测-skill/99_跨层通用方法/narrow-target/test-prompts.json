@@ -1,0 +1,73 @@
+{
+  "skill": "narrow-target",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "这次生产事故牵连了十几个人，有拍板的主责、有跟着签字的、也有只是知情的。老板说一锅端全开掉最省事，我怕这么搞人人自危。",
+      "expected_behavior": "调用 narrow-target，把涉事对象列清单按责任分档（首恶/被裹挟/可教育），给处置面设一个可核查的上限，对可教育者定不追究或从轻",
+      "notes": "正面场景：处置一批对象、怕扩大打击面，命中 A2 情境 1、5 与语言信号『一锅端』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "平台要处罚一批刷单商家，名单上有三千多家，难道全都封店？我怕处罚面太大，商家集体反弹。",
+      "expected_behavior": "调用 narrow-target，按违法轻重分档、把实际处置面压到最小比例、多数纳入教育面，避免扩大化",
+      "notes": "正面场景：处罚一批违规用户、担心处罚面太大引发反弹，命中 A2 情境 2"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "学校要处理一批考试作弊的学生，涉及几十人，教导主任想抓几个杀一儆百，可我觉得不能一概而论。",
+      "expected_behavior": "调用 narrow-target，区别对待、首恶必办胁从不问，把可教育者明确纳入教育面",
+      "notes": "正面场景：处理一批犯同类错误的学生、兼顾原则与稳定，命中 A2 情境 4 与『杀一儆百』"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "要清理历史遗留的违规问题，涉及的人不少、轻重差很多，怎么处置才不至于扩大打击面、搞成人人自危？",
+      "expected_behavior": "调用 narrow-target，先分档再给处置面设上限，明确禁止扩大化、连带的处置程序",
+      "notes": "正面场景：组织整顿、情况轻重不一，命中 A2 情境 3 与『扩大打击面』"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "竞争对手们抱团了，几家联起手来压我们，我想分化他们的联盟、把大多数拉过来。",
+      "expected_behavior": "不应激活 narrow-target，应激活 exploit-contradictions；那是处理对手阵营内部分化，本 skill 处理的是自己决定处置的一批对象、给处置面设上限",
+      "notes": "跨 skill 混淆诱饵：都涉及『多数/少数』，但对象是对手阵营而非自己要处置的名单"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "行业里各方立场不一，我们想牵头推动一个标准，该怎么团结中间那批观望的厂商、孤立几个死硬反对的？",
+      "expected_behavior": "不应激活 narrow-target，应激活 united-front-three-tier；那是对整个局面分层配置『发展/争取/孤立』，本 skill 只给处置面设数量上限",
+      "notes": "跨 skill 混淆诱饵：都像『区别对待』，但一个是分层争取、一个是给处置面设上限"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我算一下这个季度各渠道的毛利率，做个对比表。",
+      "expected_behavior": "纯数据统计，不应激活任何方法论 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "既然怕扩大化闹得人人自危，那这次干脆一个人都不处理，写份检讨教育一下就算了，这样最稳。",
+      "expected_behavior": "不应激活 narrow-target；按 B 段，放弃是非、无原则纵容（放过首恶）是本方法的反场景——『缩小打击面』的前提仍是分清责任",
+      "notes": "边界：区分『缩小打击面』与『和稀泥 / 无原则纵容』"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "事情特别紧急，明天媒体就报道了，来不及甄别谁主责谁次要，是不是先照名单全处理了再说？",
+      "expected_behavior": "不宜激活 narrow-target；B 段指出需极速决断、来不及甄别的场合，分档本身会延误，应先保证应急处置而非强行套分档",
+      "notes": "边界：区分『可从容分档的处置』与『极速决断、来不及甄别的紧急场合』"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 exploit-contradictions 与 united-front-three-tier）+ 2 条 edge_case。全部 should_not_trigger 必须通过。"
+}

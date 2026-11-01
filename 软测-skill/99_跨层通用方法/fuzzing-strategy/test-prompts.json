@@ -1,0 +1,69 @@
+{
+  "skill": "fuzzing-strategy",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "手头只有一个 PPT 解析程序、没有源码，我正纠结直接 Fuzz 还是投入做静态代码审计，怎么选？",
+      "expected_behavior": "应调用 fuzzing-strategy；第一个动作是按目标（拿 0day/系统性减缺陷）、有无源码、时间算力写下 Fuzz 与静态审计的选型理由。",
+      "notes": "正面场景：Fuzz 与静态审计的范式选择，是本 skill 第一层决策。"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "对 PDF 随机改字节盲测了十几万用例，大多在第一层解析就报错，没打到深层逻辑，变异策略该怎么改？",
+      "expected_behavior": "应调用 fuzzing-strategy；第一个动作是列出目标前 2–3 层解析器及其结构校验，判定盲测失效后转入 Smart Fuzz，按面向逻辑/数据类型/样本重构用例。",
+      "notes": "正面场景：复杂格式做 Blind Fuzz 打不到深层，需要 Smart Fuzz 三特征。"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "有一个能正常打开的 PNG 样本，想按字段类型做定点变异，长度和 CRC 怎么让工具自动维护？",
+      "expected_behavior": "应调用 fuzzing-strategy；第一个动作是建立合法样本与结构模型，用 DataModel 的 size 关系与 CRC fixup 绑定依赖，再设计按类型的变异表。",
+      "notes": "正面场景：基于样本的定点变异与长度/CRC 依赖维护。"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "SPIKE 的 block 和 Peach 的 DataModel 该选哪个？我们要对 Office 文件做面向逻辑的测试。",
+      "expected_behavior": "应调用 fuzzing-strategy；第一个动作是按“是否需要块长度自动回填、字段树建模、崩溃监控”比较工具能力，再给出选型与运行器配置方案。",
+      "notes": "正面场景：SPIKE/Peach 等工具的选型与角色定位。"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "要对一个需要登录的 FTP 服务做测试，通用工具一到 USER/PASS 就失败，登录后的命令全没测到。",
+      "expected_behavior": "不应调用本 skill；应调用 network-protocol-fuzzing，第一个动作是画协议状态机与命令清单，并用脚本建立合法会话后再测功能命令。",
+      "notes": "跨 skill 诱饵：登录/会话保持与协议命令枚举属于 network-protocol-fuzzing。"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "一个畸形 LNK 文件一打开就加载了指定 DLL，我想搞清楚它改了哪个字段、解析入口在哪、怎么构造最小 POC。",
+      "expected_behavior": "不应调用本 skill；应调用 file-format-vulnerability-reversing，第一个动作是建立格式模型并定位扩展名/魔数分派的解析入口。",
+      "notes": "跨 skill 诱饵：格式建模、字段语义与最小 POC 属于 file-format-vulnerability-reversing。"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我查一下明天上海的天气，顺便看看要不要带伞。",
+      "expected_behavior": "不应调用任何漏洞分析 skill；直接查询天气并给出建议。",
+      "notes": "完全无关场景，用于排除过度激活。"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我已经拿到一个崩溃样本，只想知道它崩在哪个函数、能不能利用，还需要继续跑 Fuzz 吗？",
+      "expected_behavior": "不应调用本 skill；第一个动作转 crash-to-root-cause（或 overflow-localization）做根因定位，利用构造再走 exploit-chain-construction。",
+      "notes": "边界：本 skill 只产出崩溃候选，不负责根因与利用，避免把 Fuzz 当成分析终点。"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "已经决定用 Fuzz，但目标文件格式的字段含义完全不清楚，是先做格式逆向还是先随机变异？",
+      "expected_behavior": "应调用本 skill，但第一个动作是按判停条件转 file-format-vulnerability-reversing 做格式建模，拿到字段树后再设计变异。",
+      "notes": "边界：Fuzz 已定但缺格式模型，先逆向再变异，体现与 file-format-vulnerability-reversing 的组合关系。"
+    }
+  ]
+}

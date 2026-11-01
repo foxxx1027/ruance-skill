@@ -1,0 +1,76 @@
+{
+  "skill": "buffer-overflow-defense-layering",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "老系统打不了补丁，但还开着 WebDAV，怎么临时降低风险？",
+      "expected_behavior": "调用本 skill，先阻断触发面并标注临时缓解",
+      "notes": "正面：无法打补丁"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "RPC 漏洞除了打补丁还能怎么防？能不能直接把 RPC 服务关了？",
+      "expected_behavior": "调用本 skill，指出禁用 RPC 的可用性代价",
+      "notes": "正面：服务加固取舍"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "拿到了一个溢出漏洞的利用链，想按攻击链逐点做防御",
+      "expected_behavior": "调用本 skill，按消除根因→阻断触发→限制后果盘点",
+      "notes": "正面：攻击链反推"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "怎么防止攻击者拿到 shell 之后继续操作？",
+      "expected_behavior": "调用本 skill，用最小权限/加密管理通道限制后果",
+      "notes": "正面：限制后渗透"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "帮我写一个栈溢出的 PoC",
+      "expected_behavior": "不调用本 skill，本 skill 不做利用开发",
+      "notes": "诱饵：利用开发"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "U 盘 autorun 怎么关",
+      "expected_behavior": "应调用 usb-autorun-hardening",
+      "notes": "跨 skill 诱饵：介质入口"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "这台机器已经中了木马，先杀毒还是先断网",
+      "expected_behavior": "应调用 malware-triage-order",
+      "notes": "跨 skill 诱饵：已感染处置"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "补丁装不上，只能关端口，关端口算修复吗？",
+      "expected_behavior": "应触发，明确临时缓解不等于修复",
+      "notes": "边界：缓解与修复"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "补丁已经打全了，还需要限制攻击者拿到 shell 后的操作吗？",
+      "expected_behavior": "应触发，说明补丁只覆盖消除根因，仍需限制后果",
+      "notes": "边界：补丁之外的后果限制"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "加密 CMD 工具设了密码就安全了吧？",
+      "expected_behavior": "应触发，指出默认密码与只加一层口令的局限",
+      "notes": "边界：防护措施有效性"
+    }
+  ]
+}

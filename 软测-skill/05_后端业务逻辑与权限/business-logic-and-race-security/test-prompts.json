@@ -1,0 +1,76 @@
+{
+  "skill": "business-logic-and-race-security",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "st-01",
+      "type": "should_trigger",
+      "prompt": "优惠券同一个账号能反复领，退款金额改成负数还能加钱，支付回调重放又发了一次货，这种流程该怎么查？",
+      "expected_behavior": "调用 business-logic-and-race-security；先画状态机与金额/次数不变量，再分别验证跳过、边界值、重放与回调验签。",
+      "notes": "优惠券、退款、支付回调三类业务逻辑问题叠加。"
+    },
+    {
+      "id": "st-02",
+      "type": "should_trigger",
+      "prompt": "库存只剩 1 件，同时下 10 个单居然都成功了，积分提现并发也能超额，是不是竞态？",
+      "expected_behavior": "调用 business-logic-and-race-security；对库存与余额不变量做受控并发验证，检查条件更新、唯一约束、锁粒度与事务隔离。",
+      "notes": "典型并发竞态与超额扣减。"
+    },
+    {
+      "id": "st-03",
+      "type": "should_trigger",
+      "prompt": "订单本来要从待支付到已支付，我直接调发货接口也能过，审批流跳过一级也能提交，想理清状态机哪里缺校验。",
+      "expected_behavior": "调用 business-logic-and-race-security；列出状态迁移与前置条件，逐条验证跳过、乱序和越级审批是否被服务端拒绝。",
+      "notes": "状态机与审批流绕过。"
+    },
+    {
+      "id": "st-04",
+      "type": "should_trigger",
+      "prompt": "短信验证码 60 秒一次，但换个手机号就能一直发，验证码用第二次还能过，这种轰炸和重放从哪下手？",
+      "expected_behavior": "调用 business-logic-and-race-security；按手机号、IP、账号、设备多维检查限速，并验证验证码绑定目标、一次性与服务端校验。",
+      "notes": "短信轰炸叠加验证码重放，属于业务滥用与频率控制。"
+    },
+    {
+      "id": "snt-01",
+      "type": "should_not_trigger",
+      "prompt": "两个线程同时检查文件存在再写入，这种 TOCTOU 时间窗怎么建模？",
+      "expected_behavior": "不应调用本 skill；应调用 logic-and-isolation-bugs 使用通用 TOCTOU 与隔离模型分析。",
+      "notes": "通用时间窗模型，不是业务状态机与账务不变量。"
+    },
+    {
+      "id": "snt-02",
+      "type": "should_not_trigger",
+      "prompt": "普通用户能改别人的订单，是因为订单接口没做对象级校验，这算业务逻辑吗？",
+      "expected_behavior": "不应调用本 skill；应调用 access-control-and-idor 按对象级授权与 IDOR 处理。",
+      "notes": "主体与对象归属问题，不是业务流程不变量。"
+    },
+    {
+      "id": "snt-03",
+      "type": "should_not_trigger",
+      "prompt": "收到一封可疑退款邮件，附件是 exe，能不能打开？",
+      "expected_behavior": "不应调用本 skill；应调用 email-trust-boundary 判断邮件与附件的信任边界。",
+      "notes": "邮件内容可信度问题，与在线业务逻辑无关。"
+    },
+    {
+      "id": "ec-01",
+      "type": "edge_case",
+      "prompt": "退款流程看起来没问题，但财务说月底对账少钱，没有日志也没有复现步骤，从哪开始？",
+      "expected_behavior": "调用 business-logic-and-race-security；先从账务不变量、异步补偿与对账差异入手收集证据，明确无法直接断言漏洞。",
+      "notes": "现象存在但证据不足，需要从数据一致性反推。"
+    },
+    {
+      "id": "ec-02",
+      "type": "edge_case",
+      "prompt": "并发下单只成功了一单，是不是就没有竞态了？",
+      "expected_behavior": "调用 business-logic-and-race-security；说明单次并发未复现不能证明无竞态，需要检查请求是否真正同时到达、锁与约束是否生效。",
+      "notes": "阴性结果不等于安全，需排除串行化与测试失真。"
+    },
+    {
+      "id": "ec-03",
+      "type": "edge_case",
+      "prompt": "内部审批系统能绕过一级审批，但不涉及钱，这算业务逻辑漏洞吗？",
+      "expected_behavior": "调用 business-logic-and-race-security；仍按状态机与审批不变量判断，影响等级可下调但缺陷性质不变。",
+      "notes": "不涉及资金仍是审批流绕过，只是风险不同。"
+    }
+  ]
+}

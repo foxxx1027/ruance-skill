@@ -1,0 +1,76 @@
+{
+  "skill": "data-backup-recovery-discipline",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "误删了 D 盘的文件，恢复软件应该装在哪？",
+      "expected_behavior": "调用本 skill，软件与恢复目标都离开原盘",
+      "notes": "正面：误删恢复"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "分区表备份放在 C 盘可以吗？",
+      "expected_behavior": "调用本 skill，按故障域判断",
+      "notes": "正面：元数据备份"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "数据库要迁移，怎么设计备份才不会和原库一起丢？",
+      "expected_behavior": "调用本 skill，按对象分层与故障域设计",
+      "notes": "正面：迁移备份"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "硬盘摔过，有异响，还能直接跑恢复软件吗？",
+      "expected_behavior": "调用本 skill，先镜像再恢复",
+      "notes": "正面：物理损伤"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "怎么给文件夹设置隐藏",
+      "expected_behavior": "不调用本 skill，这是普通文件操作",
+      "notes": "诱饵：文件属性"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "U 盘 autorun 怎么关",
+      "expected_behavior": "应调用 usb-autorun-hardening",
+      "notes": "跨 skill 诱饵：介质入口"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "公司要不要买某品牌的备份一体机",
+      "expected_behavior": "不调用本 skill，这是采购决策",
+      "notes": "诱饵：采购选型"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我把文件恢复到原盘了，但没覆盖原文件，应该没事吧？",
+      "expected_behavior": "应触发，新建/写入就算覆盖风险",
+      "notes": "边界：写入即风险"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "RAID 1 是不是就不用备份了？",
+      "expected_behavior": "应触发，RAID 不是备份",
+      "notes": "边界：冗余≠备份"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "OneDrive 同步了是不是就有备份了？",
+      "expected_behavior": "应触发，同步会把误删同步过去",
+      "notes": "边界：同步≠备份"
+    }
+  ]
+}

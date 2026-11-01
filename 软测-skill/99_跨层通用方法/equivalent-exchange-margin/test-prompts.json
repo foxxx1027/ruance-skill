@@ -1,0 +1,59 @@
+{
+  "skill": "equivalent-exchange-margin",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "两个部门要长期互相借调人手，我想先定个规则，免得总是一边白用另一边的人力，时间长了肯定有人不服。",
+      "expected_behavior": "调用 equivalent-exchange-margin，识别跨方劳动/资源转移，为每条转移建立可核算的对价（内部计价、记账或对等回报）",
+      "notes": "正面场景：跨部门资源调拨、担心一方白占，命中 A2 情境 1"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "老板想给销售定个高高的季度指标说逼一逼，我怕定太满下面直接编数据，到底该定高还是先定低一点留点余地？",
+      "expected_behavior": "调用 equivalent-exchange-margin，主张先按现实可能性定稳妥值、留弹性，并给出『超额完成后再上调』的反馈机制",
+      "notes": "正面场景：指标定高还是定低，命中 A2 情境 2 与语言信号『指标该定多高』"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我们季度报数总是注水，一层层往上加码，报上来的数字根本不敢信，怎么从机制上把这个毛病治了？",
+      "expected_behavior": "调用 equivalent-exchange-margin，指出高指标经压力传导会逼出假数据，用『实践上调、禁止因落空而造假』的机制根治，并检查留有余地是否变成不作为",
+      "notes": "正面场景：虚报、层层加码，命中 A2 情境 3 与语言信号『为什么下面总报假数据』"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我想定一个明确的数字上限，这次整顿最多涉及多少人、不超过百分之几，这种界限该怎么划？",
+      "expected_behavior": "不应激活 equivalent-exchange-margin，应激活 quantitative-grasp（胸中有数/数量分析找出质量界限）；本 skill 是分配规则与目标机制设计，此处只问数量界限本身",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：都涉及『定个数字』，但纯数量分析属 quantitative-grasp（二者 composes-with），正确答案是它而非本 skill"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "公司扩张太快，人浮于事、机构比要干的事还大，我想判断该不该瘦身、砍哪些部门，该按什么标准？",
+      "expected_behavior": "不应激活 equivalent-exchange-margin，应激活 lean-organization（精兵简政/机构—任务匹配）；本 skill 针对两方交换公平与目标弹性，不负责机构规模判定",
+      "notes": "跨 skill 混淆诱饵：都沾『降本/编制』，但此处核心是机构与任务是否匹配，属 lean-organization"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我查一下明天北京飞广州最早的一班航班几点起飞。",
+      "expected_behavior": "纯信息查询，不应激活任何激励/管理类 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们是个志愿者组织，大家互相搭把手都是自愿的、也没法折算工时，这种也要给他们定一套等价交换的规矩吗？",
+      "expected_behavior": "不应硬套 equivalent-exchange-margin；按 B 段，志愿服务/公共品这类无法定价的贡献不宜套用计价，改按贡献记录或轮换互惠处理",
+      "notes": "边界：方法前提是转移可结算，无法定价场景属 B 段排除，应换口径"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "3 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 quantitative-grasp 与 lean-organization）+ 1 条 edge_case。全部 should_not_trigger 必须通过。"
+}

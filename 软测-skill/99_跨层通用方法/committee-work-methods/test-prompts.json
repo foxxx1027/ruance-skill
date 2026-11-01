@@ -1,0 +1,66 @@
+{
+  "skill": "committee-work-methods",
+  "version": "0.1.0",
+  "source_book": "《毛泽东选集》七卷本",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我刚接手一个跨部门的项目组，每次开会大家讨论半天最后什么都没定下来，散会后各干各的，口径还对不上，怎么办？",
+      "expected_behavior": "调用 committee-work-methods，执行会前发议程（安民告示）、把分歧摆到桌面上先听后断、成员间互通情报统一口径等步骤",
+      "notes": "正面场景：新接手团队+议而不决+信息不通，命中 A2 情境 1、2"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "团队里什么事都得我拍板，我一出差项目就停摆，好几个骨干也从不主动提意见，我想把班子真正带起来。",
+      "expected_behavior": "调用 committee-work-methods，按当好班长、反对一言堂/事必躬亲、集体讨论、不耻下问等条目给出可照做的清单",
+      "notes": "正面场景：事必躬亲、个人说了算、团队无实质讨论，命中 A2 情境 3"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我手上同时压着好几个摊子，顾上这个那个就掉链子，怎么才能都兼顾又不出乱子？",
+      "expected_behavior": "调用 committee-work-methods，用『弹钢琴』（定一个中心工作、有主有次兼顾其余）给出多任务统筹安排，并检查是否顾此失彼",
+      "notes": "正面场景：多摊子并行、顾此失彼，命中 A2 情境 4 与『弹钢琴』"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "有个特别要紧的任务我布置下去了，可过了两周一点动静都没有，感觉我抓了跟没抓一个样。",
+      "expected_behavior": "调用 committee-work-methods，按『抓紧』给出检查节点与责任人（抓而不紧等于不抓），并补齐跟踪机制",
+      "notes": "正面场景：抓了但没进展，命中 A2 情境 5 与语言信号『抓了但没效果』"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "事情太多、资源只够做一件，我到底该先抓哪一个才是对的？",
+      "expected_behavior": "不应激活 committee-work-methods，应激活 principal-contradiction（抓主要矛盾与集中力量）；本 skill 回答的是『抓定中心之后怎么带团队、怎么兼顾与抓紧』，不负责『该抓哪一个』",
+      "notes": "跨 skill 混淆诱饵（硬性要求）：字面命中『抓』字，但属于 principal-contradiction 的势力范围（选中心），两者是 depends-on 关系，此处正确答案是它"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "方案我想尽快拍板，可心里对关键数字完全没底，是不是得先做一轮统计分析再说？",
+      "expected_behavior": "不应激活 committee-work-methods，应激活 quantitative-grasp（胸中有数/数量分析）；本 skill 清单里虽含『胸中有数』一条，但此处只问数量分析本身，属后者独立化后的势力范围",
+      "notes": "跨 skill 混淆诱饵：committee-work-methods 的清单包含『胸中有数』，故这条最容易抢调用；但纯问数量分析时应激活 quantitative-grasp"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我把这段英文技术文档翻译成中文，术语尽量准确。",
+      "expected_behavior": "纯翻译任务，不应激活任何团队/领导类 skill",
+      "notes": "诱饵：完全无关场景"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们团队就四个人，彼此特别熟，我照搬了一套正式的会前议程加书面报告制度，结果大家嫌麻烦、反而更慢了。",
+      "expected_behavior": "不应机械调用 committee-work-methods 的完整制度；按 B 段，团队规模极小、彼此高度熟悉时套用正式会议与报告制度会增加负担，应改轻量化做法",
+      "notes": "边界：方法适用于有一定规模的领导集体，极小团队属 B 段明确排除"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "4 条 should_trigger + 3 条 should_not_trigger（含 2 条跨 skill 混淆诱饵，分别指向 principal-contradiction 与 quantitative-grasp）+ 1 条 edge_case。全部 should_not_trigger 必须通过。"
+}

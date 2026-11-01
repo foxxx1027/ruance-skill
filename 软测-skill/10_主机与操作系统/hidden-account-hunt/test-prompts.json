@@ -1,0 +1,76 @@
+{
+  "skill": "hidden-account-hunt",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "net user 看账号都正常，但我怀疑有人留了后门账号，还要查哪里？",
+      "expected_behavior": "调用本 skill，跨视图核对",
+      "notes": "正面：单视图不可信"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "发现一个 ty$ 的账号，删不掉，怎么办？",
+      "expected_behavior": "调用本 skill，先改密切断凭据",
+      "notes": "正面：删除失败"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "怎么确认服务器上有没有攻击者建的隐藏管理员？",
+      "expected_behavior": "调用本 skill，账号/组/注册表/日志交叉",
+      "notes": "正面：入侵排查"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "Linux 上怎么查有没有 UID 0 的隐藏账号？",
+      "expected_behavior": "调用本 skill，迁移跨视图思路",
+      "notes": "正面：跨平台外推"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "帮我创建一个测试用的本地账号",
+      "expected_behavior": "不调用本 skill，这是普通管理操作",
+      "notes": "诱饵：正常建号"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "域控上怎么做账号生命周期管理",
+      "expected_behavior": "不调用本 skill，这是 IAM 流程",
+      "notes": "诱饵：企业账号治理"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "登录页一直提示密码错误，是不是钓鱼？",
+      "expected_behavior": "应调用 identity-deception-detection",
+      "notes": "跨 skill 诱饵：钓鱼"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "事件查看器里日志被清空了，是不是就查不到账号了？",
+      "expected_behavior": "应触发，日志清空不等于无证据",
+      "notes": "边界：证据被破坏"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "计算机管理里看到一个陌生账号，net user 也有，算隐藏吗？",
+      "expected_behavior": "应触发，解释隐藏判据是视图差异",
+      "notes": "边界：非隐藏的陌生账号"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "账号被禁用后，攻击者还能不能用它登录？",
+      "expected_behavior": "应触发，解释禁用/锁定与隐藏的区别及处置顺序",
+      "notes": "边界：禁用账号的有效性"
+    }
+  ]
+}

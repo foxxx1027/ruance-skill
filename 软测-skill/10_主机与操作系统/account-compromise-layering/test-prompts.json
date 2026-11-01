@@ -1,0 +1,76 @@
+{
+  "skill": "account-compromise-layering",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "微信被顶下线了，还收到异地登录提醒，我先改密码还是先冻结？",
+      "expected_behavior": "调用本 skill，先判断是否正在发生损失，按先止损后找回处理",
+      "notes": "正面场景：正在失守"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "手机丢了，支付宝、网银和绑定的银行卡怎么办？",
+      "expected_behavior": "调用本 skill，进入应急层：冻结、踢会话、挂失银行卡、关闭免密与代充",
+      "notes": "正面场景：设备丢失"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "游戏账号被盗，但没绑银行卡，改个密码是不是就行了？",
+      "expected_behavior": "调用本 skill，说明只改密码不够，还要清设备、查找回通道与隐私层",
+      "notes": "正面场景：无支付绑定的账号"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "密码改过三次了还是被踢下线，是不是电脑中木马了？",
+      "expected_behavior": "调用本 skill 做账号侧四层核查，同时指出需并行 malware-triage-order 排查终端",
+      "notes": "正面场景：反复失守"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "这个登录链接看着像银行，但域名多了个字母，是真的吗？",
+      "expected_behavior": "不应调用本 skill，应转 identity-deception-detection 判断域名与证书",
+      "notes": "跨书诱饵：身份欺骗检测"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "邮箱收到一封自称财务的邮件，附件是工资表.zip，能不能打开？",
+      "expected_behavior": "不应调用本 skill，应调用 email-trust-boundary 做隔离与三查",
+      "notes": "同书兄弟诱饵：邮件信任边界"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "C 盘空间不够了，怎么清理比较安全？",
+      "expected_behavior": "不应调用本 skill，这是系统维护问题",
+      "notes": "诱饵：完全无关"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "公司 SSO 账号被锁了，IT 说要等 30 分钟，这算被盗吗？",
+      "expected_behavior": "不按盗号处置；先区分账户锁定与账号失守，核对失败登录来源",
+      "notes": "边界：锁定不等于被盗"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我想把重要账号和注册小号分开，但不知道从哪开始。",
+      "expected_behavior": "调用本 skill 的结构性做法：列出重要/备用账号，收敛重要邮箱的暴露面",
+      "notes": "边界：无失陷迹象的分层"
+    },
+    {
+      "id": "edge-03",
+      "type": "edge_case",
+      "prompt": "账号找回要回答生日和密保问题，这些网上都能查到，怎么办？",
+      "expected_behavior": "调用本 skill，更换找回通道，不再依赖公开信息，必要时走官方人工核验",
+      "notes": "边界：找回通道可被猜测"
+    }
+  ]
+}

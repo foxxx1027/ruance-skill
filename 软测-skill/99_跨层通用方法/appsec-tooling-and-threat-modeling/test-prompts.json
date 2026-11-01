@@ -1,0 +1,76 @@
+{
+  "skill": "appsec-tooling-and-threat-modeling",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "st-01",
+      "type": "should_trigger",
+      "prompt": "我们要上线一个新系统，领导让先做威胁建模，再决定扫什么，从哪下手？",
+      "expected_behavior": "调用 appsec-tooling-and-threat-modeling；先建资产、数据流与信任边界，画攻击路径并形成可验证的威胁假设，再映射工具组合。",
+      "notes": "威胁建模先于工具选型。"
+    },
+    {
+      "id": "st-02",
+      "type": "should_trigger",
+      "prompt": "SAST、DAST、IAST 都买了，报出来的东西互相重复，研发不认，怎么合并和分诊？",
+      "expected_behavior": "调用 appsec-tooling-and-threat-modeling；统一结果字段，按根因去重，再做可达性与可控性验证，输出可利用结论。",
+      "notes": "多工具结果归一、去重与误报分诊。"
+    },
+    {
+      "id": "st-03",
+      "type": "should_trigger",
+      "prompt": "想安排一次渗透评估，但不知道攻击路径和范围怎么定，工具怎么配合。",
+      "expected_behavior": "调用 appsec-tooling-and-threat-modeling；以威胁假设定义测试问题与范围，选主手段与交叉验证手段，并明确授权与熔断条件。",
+      "notes": "渗透范围由威胁模型驱动，不是工具清单驱动。"
+    },
+    {
+      "id": "st-04",
+      "type": "should_trigger",
+      "prompt": "扫描报告几万条，研发说全是误报，我需要能复现的证据来判断。",
+      "expected_behavior": "调用 appsec-tooling-and-threat-modeling；按根因去重后抽样验证，记录可达性、前置条件与最小 PoC，区分成立、不成立与未验证。",
+      "notes": "误报分诊需要验证口径，而不是相信扫描器或研发的口头判断。"
+    },
+    {
+      "id": "snt-01",
+      "type": "should_not_trigger",
+      "prompt": "静态、动态、符号执行、Fuzz，预算有限该选哪类分析技术？",
+      "expected_behavior": "不应调用本 skill；应调用 program-analysis-technique-selection，做分析技术选型与预算分配。",
+      "notes": "选型层面问题，不进入工具编排。"
+    },
+    {
+      "id": "snt-02",
+      "type": "should_not_trigger",
+      "prompt": "给我一个 Java 代码库，想深挖反序列化那条数据流到底怎么走。",
+      "expected_behavior": "不应调用本 skill；应调用 taint-analysis（或交给 source-and-binary-static-audit），做 source→sink 污点传播追踪与单点源码深度审计。",
+      "notes": "单点深度审计而非系统级工具编排；污点传播与静态审计两条路线都成立。"
+    },
+    {
+      "id": "snt-03",
+      "type": "should_not_trigger",
+      "prompt": "想把 SAST 卡在流水线里，高危不修就禁止合并，门禁规则怎么定？",
+      "expected_behavior": "不应调用本 skill；应调用 devsecops-and-vuln-management，设计 CI 门禁、漏洞跟踪与复测流程。",
+      "notes": "流程门禁与生命周期管理。"
+    },
+    {
+      "id": "ec-01",
+      "type": "edge_case",
+      "prompt": "扫描器报了一个高危，但那段代码根本没被路由调用，还要修吗？",
+      "expected_behavior": "调用 appsec-tooling-and-threat-modeling；先判可达性与运行加载情况，把结论标为不可达或待验证，并记录判断依据而不是直接关闭。",
+      "notes": "可达性是分诊核心，需要证据与复核点。"
+    },
+    {
+      "id": "ec-02",
+      "type": "edge_case",
+      "prompt": "做渗透的那边说打进来了，但只给了一张截图，没有请求包，怎么判断真假？",
+      "expected_behavior": "调用 appsec-tooling-and-threat-modeling；要求补充可复现步骤、请求响应与前置条件，按证据标准判定成立、不成立或未验证。",
+      "notes": "不可复现的渗透结论不能直接进入修复优先级。"
+    },
+    {
+      "id": "ec-03",
+      "type": "edge_case",
+      "prompt": "我们只做人工代码审计，不用工具，是不是就不需要威胁建模了？",
+      "expected_behavior": "调用 appsec-tooling-and-threat-modeling；说明威胁建模决定人工审计的优先级与攻击路径，工具只是执行手段之一。",
+      "notes": "人工审计同样需要威胁模型来定重点。"
+    }
+  ]
+}

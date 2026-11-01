@@ -1,0 +1,76 @@
+{
+  "skill": "ssrf-xxe-and-template-injection",
+  "version": "0.1.0",
+  "test_cases": [
+    {
+      "id": "st-01",
+      "type": "should_trigger",
+      "prompt": "有个图片抓取接口，参数是完整 URL，我填自己服务器的地址能看到回连，这算 SSRF 吗？还能读到什么？",
+      "expected_behavior": "调用 ssrf-xxe-and-template-injection；先核查出站策略与 URL 解析差异，再用自控监听做最小对照，按可达目标、协议与跳转行为评估影响。",
+      "notes": "典型 SSRF 场景，必须强调只向自控地址发起验证。"
+    },
+    {
+      "id": "st-02",
+      "type": "should_trigger",
+      "prompt": "上传 XML 后服务端会解析，响应里能回显文件内容，但我加 DOCTYPE 就被拦了，还有别的验证办法吗？",
+      "expected_behavior": "调用 ssrf-xxe-and-template-injection；检查 DTD、参数实体、外部 DTD 与 XInclude 的不同开关，并用自控带外信道验证盲 XXE。",
+      "notes": "XXE 防护不完整，需逐项确认解析器能力。"
+    },
+    {
+      "id": "st-03",
+      "type": "should_trigger",
+      "prompt": "模板里渲染用户昵称，输入 {{7*7}} 页面出现 49，是不是模板注入？",
+      "expected_behavior": "调用 ssrf-xxe-and-template-injection；识别模板引擎与上下文，用无害表达式与字面量做对照，再核查沙箱与对象访问边界。",
+      "notes": "SSTI 算术对照，避免直接执行系统命令。"
+    },
+    {
+      "id": "st-04",
+      "type": "should_trigger",
+      "prompt": "登录接口用的是 Mongo，我把 password 改成 {\"$ne\":null} 就进去了，这是什么问题？",
+      "expected_behavior": "调用 ssrf-xxe-and-template-injection；按 NoSQL 类型混淆与操作符注入检查请求体是否整体进入查询构造器，并用自有账号复现。",
+      "notes": "NoSQL 操作符注入导致认证绕过。"
+    },
+    {
+      "id": "snt-01",
+      "type": "should_not_trigger",
+      "prompt": "搜索参数加单引号就报 SQL 语法错误，能不能用 union 把用户表拖出来？",
+      "expected_behavior": "不应调用本 skill；应调用 non-memory-vulnerability-analysis 处理 SQL 注入与 UNION/盲注验证。",
+      "notes": "SQL 注入不属于本 skill 的五类解释器。"
+    },
+    {
+      "id": "snt-02",
+      "type": "should_not_trigger",
+      "prompt": "上传 php 文件改成 jpg 后缀还能被解析，怎么绕扩展名和 MIME 检测？",
+      "expected_behavior": "不应调用本 skill；应调用 upload-parser-bypass-audit 处理上传解析器与文件类型判定绕过。",
+      "notes": "上传解析问题，不是 XML 实体或命令解释器。"
+    },
+    {
+      "id": "snt-03",
+      "type": "should_not_trigger",
+      "prompt": "Cookie 里有一段 rO0AB 开头的 base64，怀疑是 Java 反序列化入口，怎么找可用 gadget？",
+      "expected_behavior": "不应调用本 skill；应调用 java-deserialization-entry-enumeration 枚举反序列化入口与 gadget 链。",
+      "notes": "序列化流不属于本 skill 的文本/结构化输入注入。"
+    },
+    {
+      "id": "ec-01",
+      "type": "edge_case",
+      "prompt": "运维脚本用 Runtime.exec 拼了用户传的 host，参数里带分号没反应，带换行好像有延迟，怎么确认？",
+      "expected_behavior": "调用 ssrf-xxe-and-template-injection；按命令注入模块比较换行、编码变体与参数注入，优先用时间差或自控带外做无害对照。",
+      "notes": "命令注入边界，分号被过滤但换行可能仍生效。"
+    },
+    {
+      "id": "ec-02",
+      "type": "edge_case",
+      "prompt": "SSRF 只允许 http 和 https，内网 IP 也被拦了，但 302 跳转到内网还能不能打？",
+      "expected_behavior": "调用 ssrf-xxe-and-template-injection；检查 HTTP 客户端是否跟随跳转、跳转后的二次解析与目标校验，并用自控跳转服务验证。",
+      "notes": "重定向绕过是 SSRF 的常见解析差异。"
+    },
+    {
+      "id": "ec-03",
+      "type": "edge_case",
+      "prompt": "前端模板把用户输入转义了，但后端邮件模板也用了同一个值，这算 SSTI 还是 XSS？",
+      "expected_behavior": "调用 ssrf-xxe-and-template-injection；按服务端模板引擎与上下文判断是否被求值，区分 HTML 转义与模板表达式求值两套机制。",
+      "notes": "同一数据进入不同上下文，需要先判解释器再定性。"
+    }
+  ]
+}
